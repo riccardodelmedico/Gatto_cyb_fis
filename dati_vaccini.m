@@ -1,7 +1,7 @@
 %% Dati su vaccinazione in Italia (al 11/05/2021)
 T=readtable('somministrazioni-vaccini-latest.csv');
 
-pop= 59257566;
+pop= 59257566; %istat 2020
 n=height(T);
 vaccini=[T(1:n,1), T(1:n,17), T(1:n,18)];
 vaccini_matrix_timetable= table2timetable(vaccini);
