@@ -52,16 +52,19 @@ figure(2)
 plot(t, x_vaccini(:,2:end))
 legend('E(t)', 'P(t)', 'I(t)', 'A(t)', 'H(t)', 'Q(t)', 'R(t)', 'D(t)')
 
+x10=x_vaccini(novax,:); % ho provato a mettere le condizioni iniziali per il secondo set di equazioni ... 
+                        % come i valori della dinamica nel giorno in cui si
+                        % comincia la vaccinazione
 %% modello Gatto 2 popolazione (prima dose)
-x10 = 1e-9*ones(9,1);
+
 tic
 [t,x_vaccini2]= ode45('gatto_vaccini2', time, x10); 
 toc
 %
-figure(1)
+figure(3)
 plot(t, x_vaccini2(:,:))
 legend('S(t)','E(t)', 'P(t)', 'I(t)', 'A(t)', 'H(t)', 'Q(t)', 'R(t)', 'D(t)')
-figure(2)
+figure(4)
 plot(t, x_vaccini2(:,2:end))
 legend('E(t)', 'P(t)', 'I(t)', 'A(t)', 'H(t)', 'Q(t)', 'R(t)', 'D(t)')
 %% modello Gatto 3 popolazione (seconda dose)
