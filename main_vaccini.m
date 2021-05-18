@@ -5,7 +5,7 @@ clear all
 format longg
 parameters_vaccini;
 dati_vaccini;
-global lambda deltaE deltaP sigm eta gammaI alfaI gammaA zeta gammaH ...
+global lambda deltaE deltaP sigma eta gammaI alfaI gammaA zeta gammaH ...
        alfaH gammaQ gammaA x0 N eff1 eff2 ef1 prima_dose_ seconda_dose_
 
 % prima_d=prima_dose_norm;
@@ -52,11 +52,11 @@ figure(2)
 plot(t, x_vaccini(:,2:end))
 legend('E(t)', 'P(t)', 'I(t)', 'A(t)', 'H(t)', 'Q(t)', 'R(t)', 'D(t)')
 
-x10=x_vaccini(novax,:); % ho provato a mettere le condizioni iniziali per il secondo set di equazioni ... 
+% x10=x_vaccini(novax,:); % ho provato a mettere le condizioni iniziali per il secondo set di equazioni ... 
                         % come i valori della dinamica nel giorno in cui si
                         % comincia la vaccinazione
 %% modello Gatto 2 popolazione (prima dose)
-
+x10 = 1e-9*ones(9,1);
 tic
 [t,x_vaccini2]= ode45('gatto_vaccini2', time, x10); 
 toc
@@ -73,10 +73,10 @@ tic
 [t,x_vaccini2]= ode45('gatto_vaccini3', time, x20); 
 toc
 %
-figure(1)
+figure(5)
 plot(t, x_vaccini2(:,:))
 legend('S(t)','E(t)', 'P(t)', 'I(t)', 'A(t)','R(t)')
 
-figure(2)
+figure(6)
 plot(t, x_vaccini2(:,2:end))
 legend('E(t)', 'P(t)', 'I(t)', 'A(t)', 'R(t)')

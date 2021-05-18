@@ -1,7 +1,7 @@
 %% Gatto model con vaccini
 function xdot= gatto_vaccini(t,x)
 
-global lambda deltaE deltaP sigm eta gammaI alfaI gammaA zeta gammaH alfaH ...
+global lambda deltaE deltaP sigma eta gammaI alfaI gammaA zeta gammaH alfaH ...
     gammaQ gammaA betaP betaA betaI N x0 eff1 eff2 ef1 prima_dose_ seconda_dose_
 S = x(1); %suscettibili
 E = x(2); %esposti
@@ -24,11 +24,11 @@ xdot = zeros(9,1);
     xdot(1) = - lambda*S-eff1*prima_dos;
     xdot(2) = lambda*S - deltaE*E;
     xdot(3) = deltaE*E - deltaP*P;
-    xdot(4) = sigm*deltaP*P - (eta + gammaI + alfaI)*I;
-    xdot(5) = (1 - sigm)*deltaP*P - gammaA*A;
+    xdot(4) = sigma*deltaP*P - (eta + gammaI + alfaI)*I;
+    xdot(5) = (1 - sigma)*deltaP*P - gammaA*A;
     xdot(6) = (1 - zeta)*eta*I - (gammaH + alfaH)*H;
     xdot(7) = zeta*eta*I - gammaQ*Q;
-    xdot(8) = gammaI*I + gammaA*A + gammaH*H;
+    xdot(8) = gammaI*I + gammaA*A + gammaH*H +gammaQ*Q; %inserito il recupero delle persone in quarantena
     xdot(9) = alfaI*I + alfaH*H;
 
 end

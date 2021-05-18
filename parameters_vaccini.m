@@ -1,7 +1,7 @@
-global lambda deltaE deltaP sigm eta gammaI alfaI gammaA zeta gammaH ...
+global lambda deltaE deltaP sigma eta gammaI alfaI gammaA zeta gammaH ...
        alfaH gammaQ gammaA betaP betaI betaA eff1 eff2 ef1
 
-R0=2.5;
+R0=3.6;
 deltaE= 1 / 3.32;
 deltaP= 1 / 0.75;
 eta= 1 / 4.05;
@@ -10,8 +10,8 @@ gammaQ=gammaI;
 gammaH= gammaI;
 gammaA= 2*gammaI;
 alfaI= 1 / 24.23;
-sigm= 0.25; % (1-sigma) frazione degli asintomatici
-betaP = R0/(1/deltaP + 1.03*sigm/( eta + alfaI + gammaI)+ 0.033*(1-sigm) / gammaA);
+sigma= 0.25; % (1-sigma) frazione degli asintomatici
+betaP = R0/(1/deltaP + 1.03*sigma/( eta + alfaI + gammaI)+ 0.033*(1-sigma) / gammaA);
 betaA= 0.033*betaP; %betaA asymptomatic transmission rate
 betaI= 1.03*betaA;
 % betaP1/ betaP== 0.82; % betaP1 after restriction on february 22, 2020

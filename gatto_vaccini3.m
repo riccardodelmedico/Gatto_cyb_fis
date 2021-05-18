@@ -1,6 +1,6 @@
 function xdot= gatto_vaccini3(t,x)
 
-global lambda deltaE deltaP sigm eta gammaI alfaI gammaA zeta gammaH alfaH ...
+global lambda deltaE deltaP sigma eta gammaI alfaI gammaA zeta gammaH alfaH ...
     gammaQ gammaA betaP betaA betaI N x0 eff1 eff2 ef1 prima_dose_ seconda_dose_
 S2 = x(1); %suscettibili
 E2 = x(2); %esposti
@@ -21,8 +21,8 @@ xdot = zeros(6,1);
     xdot(1) = - lambda*S2+eff2*seconda_dos;
     xdot(2) = lambda*S2 - deltaE*E2;
     xdot(3) = deltaE*E2 - deltaP*P2;
-    xdot(4) = sigm*deltaP*P2 - gammaA*I2;
-    xdot(5) = (1 - sigm)*deltaP*P2 - gammaA*A2;
+    xdot(4) = sigma*deltaP*P2 - gammaA*I2;
+    xdot(5) = (1 - sigma)*deltaP*P2 - gammaA*A2;
     xdot(6) = gammaA*I2 - gammaA*A2;
 
 
