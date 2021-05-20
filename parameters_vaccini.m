@@ -1,5 +1,5 @@
 global lambda deltaE deltaP sigma eta gammaI alfaI gammaA zeta gammaH ...
-       alfaH gammaQ gammaA betaP betaI betaA eff1 eff2 ef1
+       alfaH gammaQ gammaA betaP betaI betaA eff1 eff2 ef1 theta
 
 R0=3.6;
 deltaE= 1 / 3.32;
@@ -24,5 +24,6 @@ alfaH = alfaI;
 eff1 = 0.9;
 eff2 = 1;
 ef1 = 0.7;
+theta = 0.5; %efficacia del lockdown
 % options = optimoptions('fmincon','Display','none','Algorithm','active-set',...
 %     'OptimalityTolerance', 1e-1, 'MaxFunctionEvaluations', 5,'FunValCheck','on');

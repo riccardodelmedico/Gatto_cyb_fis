@@ -7,23 +7,29 @@ format longg
 parameters_vaccini;
 dati_vaccini;
 global lambda deltaE deltaP sigm eta gammaI alfaI gammaA zeta gammaH ...
-       alfaH gammaQ gammaA x0 N eff1 eff2 ef1 prima_d seconda_d
+       alfaH gammaQ gammaA x0 N eff1 eff2 ef1 prima_d seconda_d Lvect
 
 % prima_d=prima_dose_norm;
 % seconda_d=seconda_dose_norm;
 
 % Caricamento dati iniziali opzione 1
-%si fa evolvere l'epidemia senza alcun controllo (lockdown)
+%si fa evolvere l'epidemia con controllo dopo 18 giorni(lockdown)
 %e senza usare vaccini per un numero specificato di giorni, poi si comincia
 %l'intervento con i vaccini con le somministrazioni giornaliere effettuate
 %in Italia a partire dal 27/12/2020
-novax=80;
-N=novax+136;
+nolockdown= 18;
+novax= 62;
+N= nolockdown + novax + 136;
 time= 0:1:N-1;
 E0= 10/pop;
 x0= [1-E0 E0 zeros(1,22)]; 
-prima_d= [zeros(novax,1); prima_dose_norm];
-seconda_d=[zeros(novax,1); seconda_dose_norm];
+prima_d= [zeros(novax+nolockdown,1); prima_dose_norm];
+seconda_d=[zeros(novax+nolockdown,1); seconda_dose_norm];
+Lvect= [zeros(nolockdown,1); 0.7*ones(novax,1); zeros(136,1)]; %si suppone che il lockdown
+%duri a partire dal 18esimo giorno e termini il giorno in cui cominciano le
+%vaccinazioni
+
+
 
 % %% Caricamento dati iniziali opzione 2
 % %si utilizzano i valori reali dell'epidemia nel giorno in cui sono
@@ -125,11 +131,11 @@ seconda_d=[zeros(novax,1); seconda_dose_norm];
 
 
 
-
+%%
 %VEDIAMO CHE SUCCEDE ACCOPPIANDO LE DINAMICHE
 
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_TOT', time, x0); 
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', time, x0); 
 toc
 
 figure(1)

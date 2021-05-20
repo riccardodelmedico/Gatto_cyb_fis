@@ -1,7 +1,8 @@
-function xdot= gatto_vaccini_TOT(t,x)
+function xdot= gatto_vaccini_unico(t,x)
 
 global lambda deltaE deltaP sigma eta gammaI alfaI gammaA zeta gammaH alfaH ...
-    gammaQ gammaA betaP betaA betaI N x0 eff1 eff2 ef1 prima_d seconda_d
+    gammaQ gammaA betaP betaA betaI N x0 eff1 eff2 ef1 prima_d seconda_d ...
+    Lvect theta
 
 S = x(1); %suscettibili
 E = x(2); %esposti
@@ -34,12 +35,13 @@ R2 = x(24); %recuperati
 
 prima_dos=prima_d(fix(t)+1);
 seconda_dos=seconda_d(fix(t)+1);
+L=Lvect(fix(t)+1);
 
 lambda= (betaP*(P+P1+P2) + betaI*(I+I1+I2) + betaA*(A+A1+A2))/(S + E + (P+P1+P2) + (I+I1+I2) + (A+A1+A2) + R);
 xdot = zeros(24,1);
 
-    xdot(1) = - lambda*S-eff1*prima_dos;
-    xdot(2) = lambda*S - deltaE*E;
+    xdot(1) = - lambda*S*(1-theta*L)^2-eff1*prima_dos;
+    xdot(2) = lambda*S*(1-theta*L)^2 - deltaE*E;
     xdot(3) = deltaE*E - deltaP*P;
     xdot(4) = sigma*deltaP*P - (eta + gammaI + alfaI)*I;
     xdot(5) = (1 - sigma)*deltaP*P - gammaA*A;
