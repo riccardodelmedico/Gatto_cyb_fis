@@ -25,9 +25,7 @@ E0= 100/pop;
 x0= [1-E0 E0 zeros(1,22)]; 
 prima_d= [zeros(novax+nolockdown,1); prima_dose_norm];
 seconda_d=[zeros(novax+nolockdown,1); seconda_dose_norm];
-Lvect= [zeros(nolockdown,1); 0.7.*ones(novax,1); 0.45*ones(136,1)]; %si suppone che il lockdown
-%duri a partire dal 18esimo giorno e termini il giorno in cui cominciano le
-%vaccinazioni
+
 
 
 
@@ -40,21 +38,19 @@ Lvect= [zeros(nolockdown,1); 0.7.*ones(novax,1); 0.45*ones(136,1)]; %si suppone 
 % % 20% infettivi e 50% presintomatici
 % N=136;
 % time= 0:1:N-1;
-% totale_ospedalizzati= 26151;
-% totale_quarantena= 555609;
-% totale_positivi= 581760;
-% deceduti= 71925;
-% dimessi_guariti= 1394011; %sarebbero i nostri recuperati
-
-
-
-
-
-
+% totale_ospedalizzati= 26151; ( 0.000441310734902611 per la popolazione normalizzata)
+% totale_quarantena= 555609; (0.00937616978733146 idem)
+% totale_positivi= 581760;  (0.00981748052223407 idem)
+% deceduti= 71925;  (0.00121376905693359 idem)
+% dimessi_guariti= 1394011; %sarebbero i nostri recuperati (0.0235246078112624 idem)
 
 
 %%
 %VEDIAMO CHE SUCCEDE ACCOPPIANDO LE DINAMICHE
+Lvect= [zeros(nolockdown,1); 0.7.*ones(novax,1); 0.45*ones(136,1)]; %si suppone che il lockdown
+%duri a partire dal 18esimo giorno e termini il giorno in cui cominciano le
+%vaccinazioni
+
 
 tic
 [t,x_vaccini_tot]= ode45('gatto_vaccini_unico', time, x0); 
@@ -78,4 +74,34 @@ legend('E1(t)', 'P1(t)', 'I1(t)', 'A1(t)', 'H1(t)', 'Q1(t)', 'R1(t)', 'D1(t)')
 figure(5) %altre variabili 3 gatto
 plot(t, x_vaccini_tot(:,19:24))
 legend('S2(t)','E2(t)', 'P2(t)', 'I2(t)', 'A2(t)','R2(t)')
+%
+
+%% ora introduciamo le cascate di Ode
+global x0_casc
+Lvect= [zeros(nolockdown,1); 0.3*ones(novax,1); 0.2*ones(136,1)]; %si suppone che il lockdown
+%duri a partire dal 18esimo giorno e termini il giorno in cui cominciano le
+%vaccinazioni
+x0_casc = [1-1*E0 , 1*E0, zeros(1,29)];
+tic
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico_cascate', time, x0_casc); 
+toc
+
+figure(1)
+plot(t, x_vaccini_tot(:,:)) %plot totale
+
+figure(2)
+plot(t, x_vaccini_tot(:,[1 13 25])) %visione suscettibili
+legend('S(t)','S1(t)','S2(t)')
+
+figure(3)
+plot(t, x_vaccini_tot(:,2:12)) %altre variabili 1 gatto
+legend('E1(t)','E2(t)', 'P(t)', 'I(t)', 'A(t)', 'H1(t)','H2(t)','H3(t)', 'Q(t)', 'R(t)', 'D(t)')
+
+figure(4) %altre variabili 2 gatto
+plot(t, x_vaccini_tot(:,14:24))
+legend('E1(t)','E2(t)', 'P(t)', 'I(t)', 'A(t)', 'H1(t)','H2(t)','H3(t)', 'Q(t)', 'R(t)', 'D(t)')
+
+figure(5) %altre variabili 3 gatto
+plot(t, x_vaccini_tot(:,26:31))
+legend('E21(t)','E22(t)', 'P2(t)', 'I2(t)', 'A2(t)','R2(t)')
 %
