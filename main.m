@@ -51,13 +51,13 @@ hold off
 
 %%
 %VEDIAMO CHE SUCCEDE ACCOPPIANDO LE DINAMICHE
+options = odeset('RelTol',1e-8,'AbsTol',1e-10);
 Lvect= [zeros(nolockdown,1); 0.5*ones(novax,1); 0.5*ones(136,1)]; %si suppone che il lockdown
 %duri a partire dal 18esimo giorno e termini il giorno in cui cominciano le
 %vaccinazioni
 x0= [1-1*E0 1*E0 zeros(1,22)];
-
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', time, x0); 
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', time, x0,options); 
 toc
 
 figure(1)
@@ -76,18 +76,19 @@ plot(t, x_vaccini_tot(:,11:18))
 legend('E1(t)', 'P1(t)', 'I1(t)', 'A1(t)', 'H1(t)', 'Q1(t)', 'R1(t)', 'D1(t)')
 
 figure(5) %altre variabili 3 gatto
-plot(t, x_vaccini_tot(:,19:24))
+plot(t, x_vaccini_tot(:,20:24))
 legend('S2(t)','E2(t)', 'P2(t)', 'I2(t)', 'A2(t)','R2(t)')
 %
 
 %% ora introduciamo le cascate di Ode ma secondo il Gatto (su E e su H come a pgina 11)
 global x0_casc
-Lvect= [zeros(nolockdown,1); 0.3*ones(novax,1); 0.3*ones(136,1)]; %si suppone che il lockdown
+Lvect= [zeros(nolockdown,1); 0.4*ones(novax,1); 0.3*ones(136,1)]; %si suppone che il lockdown
 %duri a partire dal 18esimo giorno e termini il giorno in cui cominciano le
 %vaccinazioni
 x0_casc = [1-1*E0 , 1*E0, zeros(1,29)];
+options = odeset('RelTol',1e-8,'AbsTol',1e-10);
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico_cascate', time, x0_casc); 
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico_cascate', time, x0_casc,options); 
 toc
 
 figure(1)
@@ -110,14 +111,14 @@ plot(t, x_vaccini_tot(:,26:31))
 legend('E21(t)','E22(t)', 'P2(t)', 'I2(t)', 'A2(t)','R2(t)')
 
 %% ora facciamo la cascata di 3 ode su infetti come suggerito da manfredi
-
+options = odeset('RelTol',1e-8,'AbsTol',1e-10);
 global x0_casc_inf
 Lvect= [zeros(nolockdown,1); 0.6*ones(novax,1); 0.5*ones(136,1)]; %si suppone che il lockdown
 %duri a partire dal 18esimo giorno e termini il giorno in cui cominciano le
 %vaccinazioni
 x0_casc_inf = [1-1*E0 , 1*E0, zeros(1,28)];
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico_cascatesoloInfetti', time, x0_casc_inf); 
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico_cascatesoloInfetti', time, x0_casc_inf,options); 
 toc
 
 figure(1)
@@ -139,7 +140,7 @@ figure(5) %altre variabili 3 gatto
 plot(t, x_vaccini_tot(:,23:30))
 legend('E2(t)','P2(t)', 'I12(t)','I22(t)','I23(t)', 'A2(t)', 'R2(t)')
 
-%%
+%% analisi andamento lambda
 x = x_vaccini_tot;
 
 
