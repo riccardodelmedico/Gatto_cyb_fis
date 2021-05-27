@@ -44,7 +44,7 @@ seconda_dos=seconda_d(fix(t)+1);
 L=Lvect(fix(t)+1);
 
 
-lambda= (betaP*(P+P1+P2) + betaI*(I3+I13+I23) + betaA*(A+A1+A2))/((S+S1+S2) + (E+E1+E2) + (I3+I13+I23) + (A+A1+A2) + (R+R1+R2));
+lambda= (betaP*(P+P1+P2) + betaI*(I3+I13+I23) + betaA*(A+A1+A2))/((S+S1+S2) + (E+E1+E2) + (I1+I2+I3+I11+I12+I13++I21+I22+I23) + (A+A1+A2) + (R+R1+R2));
 xdot = zeros(30,1);
 
     xdot(1) = - lambda*S*(1-teta*L)^2 - eff1*prima_dos;
@@ -60,10 +60,10 @@ xdot = zeros(30,1);
     xdot(11) = alfaI*I3 + alfaH*H;
     %%%%POI LA SECONDA DINAMICA, CHE è ACCOPPIATA TRAMITE LAMBDA
     
-    xdot(12) = - lambda*S1*(1-teta*L)^2+eff1*prima_dos-eff2*seconda_dos;
+    xdot(12) = - lambda*S1*(1-teta*L)^2+ eff1*prima_dos -eff2*seconda_dos;
     xdot(13) = lambda*S1*(1-teta*L)^2 - deltaE*E1;
     xdot(14) = deltaE*E1 - deltaP*P1;
-    xdot(15) = sig*deltaP*P1 - ((1-ef1)*eta + gammaI +(1-ef1)*alfaI)*3*I1;
+    xdot(15) = sig*deltaP*P1 - ((1-ef1)*eta + gammaI +(1-ef1)*alfaI)*3*I11;
     xdot(16) = ((1-ef1)*eta + gammaI +(1-ef1)*alfaI)*3*I11 - ((1-ef1)*eta + gammaI +(1-ef1)*alfaI)*3*I12;
     xdot(17) = ((1-ef1)*eta + gammaI +(1-ef1)*alfaI)*3*I12 - ((1-ef1)*eta + gammaI +(1-ef1)*alfaI)*3*I13;
     xdot(18) = (1 - sig)*deltaP*P1 - gammaA*A1;
