@@ -17,11 +17,11 @@ global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
 %e senza usare vaccini per un numero specificato di giorni, poi si comincia
 %l'intervento con i vaccini con le somministrazioni giornaliere effettuate
 %in Italia a partire dal 27/12/2020
-nolockdown= 18;
-novax= 62;
+nolockdown= 25;
+novax= 270;
 N= nolockdown + novax + NV;
 time= 0:1:N-1;
-E0= 100/pop;
+E0= 10/pop;
  
 prima_d= [zeros(novax+nolockdown,1); prima_dose_norm];
 seconda_d=[zeros(novax+nolockdown,1); seconda_dose_norm];
@@ -57,28 +57,48 @@ Lvect= [zeros(nolockdown,1); 0.5*ones(novax,1); 0.5*ones(136,1)]; %si suppone ch
 %vaccinazioni
 x0= [1-1*E0 1*E0 zeros(1,22)];
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', time, x0,options); 
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:1:nolockdown, x0,options); 
 toc
 
 figure(1)
 plot(t, x_vaccini_tot(:,:)) %plot totale
 
+% figure(2)
+% plot(t, x_vaccini_tot(:,[1 10 19])) %visione suscettibili
+% legend('S(t)','S1(t)','S2(t)')
+%
 figure(2)
-plot(t, x_vaccini_tot(:,[1 10 19])) %visione suscettibili
-legend('S(t)','S1(t)','S2(t)')
-
-figure(3)
 plot(t, x_vaccini_tot(:,2:9)) %altre variabili 1 gatto
 legend('E(t)', 'P(t)', 'I(t)', 'A(t)', 'H(t)', 'Q(t)', 'R(t)', 'D(t)')
-
-figure(4) %altre variabili 2 gatto
-plot(t, x_vaccini_tot(:,11:18))
-legend('E1(t)', 'P1(t)', 'I1(t)', 'A1(t)', 'H1(t)', 'Q1(t)', 'R1(t)', 'D1(t)')
-
-figure(5) %altre variabili 3 gatto
-plot(t, x_vaccini_tot(:,20:24))
-legend('S2(t)','E2(t)', 'P2(t)', 'I2(t)', 'A2(t)','R2(t)')
 %
+% figure(4) %altre variabili 2 gatto
+% plot(t, x_vaccini_tot(:,11:18))
+% legend('E1(t)', 'P1(t)', 'I1(t)', 'A1(t)', 'H1(t)', 'Q1(t)', 'R1(t)', 'D1(t)')
+% 
+% figure(5) %altre variabili 3 gatto
+% plot(t, x_vaccini_tot(:,20:24))
+% legend('S2(t)','E2(t)', 'P2(t)', 'I2(t)', 'A2(t)','R2(t)')
+
+%% ora cambiamo R0, così scalando tutto e vediamo come evolve il sistema
+% carichiamo i nuovi parametri dei vaccini 
+%(si potrebbe fare anche con il lockdown, ma così scaliamo direttamente R0 e i beta)
+parameters_vaccini_R0_1;
+Lvect = zeros(N,1);
+
+%aggiorniamo le condizioni iniziali del nuovo sistema
+x0 = x_vaccini_tot(end,:);
+
+%risolviamo il Gatto senza vaccini per 6 mesi
+tic
+[t1,x_vaccini_tot1]= ode45('gatto_vaccini_unico', 0:1:novax, x0,options); 
+toc
+
+figure (1)
+% t_tot = [t,t1];
+plot(t1, x_vaccini_tot1(:,:))
+
+
+
 
 %% ora introduciamo le cascate di Ode ma secondo il Gatto (su E e su H come a pgina 11)
 global x0_casc
@@ -110,10 +130,12 @@ figure(5) %altre variabili 3 gatto
 plot(t, x_vaccini_tot(:,26:31))
 legend('E21(t)','E22(t)', 'P2(t)', 'I2(t)', 'A2(t)','R2(t)')
 
+
+
 %% ora facciamo la cascata di 3 ode su infetti come suggerito da manfredi
 options = odeset('RelTol',1e-8,'AbsTol',1e-10);
 global x0_casc_inf
-Lvect= [zeros(nolockdown,1); 0.6*ones(novax,1); 0.5*ones(136,1)]; %si suppone che il lockdown
+Lvect= [zeros(nolockdown,1); 0.1*ones(novax,1); 0.1*ones(136,1)]; %si suppone che il lockdown
 %duri a partire dal 18esimo giorno e termini il giorno in cui cominciano le
 %vaccinazioni
 x0_casc_inf = [1-1*E0 , 1*E0, zeros(1,28)];
@@ -139,47 +161,3 @@ legend('E1(t)','P1(t)', 'I13(t)', 'A1(t)', 'H1(t)', 'Q1(t)', 'R1(t)', 'D1(t)')
 figure(5) %altre variabili 3 gatto
 plot(t, x_vaccini_tot(:,23:30))
 legend('E2(t)','P2(t)', 'I12(t)','I22(t)','I23(t)', 'A2(t)', 'R2(t)')
-
-%% analisi andamento lambda
-x = x_vaccini_tot;
-
-
-S = x(:,1); %suscettibili
-E = x(:,2); %esposti
-P = x(:,3); %presintomatici
-I1 = x(:,4);%infetti
-I2 = x(:,5);
-I3 = x(:,6);
-A = x(:,7); %asintomatici
-H = x(:,8); %ospedalizzati
-Q = x(:,9); %quarantena casalinga
-R = x(:,10); %recuperati
-D = x(:,11); %dead
-% parameters_vaccini;
-% dati_vaccini;
-S1 = x(:,12); %suscettibili
-E1 = x(:,13); %esposti
-P1 = x(:,14); %presintomatici
-I11 = x(:,15);%infetti
-I12 = x(:,16);
-I13 = x(:,17);
-A1 = x(:,18); %asintomatici
-H1 = x(:,19); %ospedalizzati
-Q1 = x(:,20); %quarantena casalinga
-R1 = x(:,21); %recuperati
-D1 = x(:,22); %dead
-% parameters_vaccini;
-% dati_vaccini;
-S2 = x(:,23); %suscettibili
-E2 = x(:,24); %esposti gruppo
-P2 = x(:,25); %presintomatici
-I21 = x(:,26);%infetti
-I22 = x(:,27);
-I23 = x(:,28);
-A2 = x(:,29); %asintomatici
-R2 = x(:,30); 
-
-lambda= (betaP*(P+P1+P2) + betaI*(I3+I13+I23) + betaA*(A+A1+A2))./(S + E + (I3+I13+I23) + (A+A1+A2) + R);
-plot(time,lambda)
-%
-plot(time,E)
