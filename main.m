@@ -25,7 +25,7 @@ E0= 10/pop;
  
 prima_d= [zeros(novax+nolockdown,1); prima_dose_norm];
 seconda_d=[zeros(novax+nolockdown,1); seconda_dose_norm];
-%%
+%
 figure(1)
 plot(time, prima_d)
 hold on
@@ -57,7 +57,7 @@ Lvect= [zeros(nolockdown,1); 0.5*ones(novax,1); 0.5*ones(136,1)]; %si suppone ch
 %vaccinazioni
 x0= [1-1*E0 1*E0 zeros(1,22)];
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:1:nolockdown, x0,options); 
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:1:nolockdown-1, x0,options); 
 toc
 
 figure(1)
@@ -94,11 +94,30 @@ tic
 toc
 
 figure (1)
-% t_tot = [t,t1];
-plot(t1, x_vaccini_tot1(:,:))
+t_tot = 0:1:(novax+nolockdown);
+plot(t_tot, [x_vaccini_tot(:,:); x_vaccini_tot1(:,:)])
 
 
+ %% equivalente scalatura di R0, assunto che il lockdown abbia contributo quadratico
+ %semplicemente vogliamo una scalatura di 3.6 del termine lambda, tramite
+ %la moltiplicazione di (1-L)^2 = 1/3.6=0.2777---->(1-L)= 0.527--->L = 0.473
+ 
+ %rimettiamo allora R0 a 3.6
+parameters_vaccini 
+Lvect = [zeros(nolockdown,1); 0.473*ones(N-nolockdown,1) ];
 
+%rimettiamo le condizioni iniziali come prima
+x0= [1-1*E0 1*E0 zeros(1,22)];
+
+%risolviamo il Gatto senza vaccini per 6 mesi
+tic
+[t1,x_vaccini_tot2]= ode45('gatto_vaccini_unico', 0:1:(novax+nolockdown-1), x0,options); 
+toc
+
+figure (1)
+t_tot = 0:1:(novax+nolockdown-1);
+plot(t_tot, x_vaccini_tot2(:,:))
+ 
 
 %% ora introduciamo le cascate di Ode ma secondo il Gatto (su E e su H come a pgina 11)
 global x0_casc
@@ -135,7 +154,7 @@ legend('E21(t)','E22(t)', 'P2(t)', 'I2(t)', 'A2(t)','R2(t)')
 %% ora facciamo la cascata di 3 ode su infetti come suggerito da manfredi
 options = odeset('RelTol',1e-8,'AbsTol',1e-10);
 global x0_casc_inf
-Lvect= [zeros(nolockdown,1); 0.1*ones(novax,1); 0.1*ones(136,1)]; %si suppone che il lockdown
+Lvect= [zeros(nolockdown,1); 0.6*ones(novax,1); 0.3*ones(136,1)]; %si suppone che il lockdown
 %duri a partire dal 18esimo giorno e termini il giorno in cui cominciano le
 %vaccinazioni
 x0_casc_inf = [1-1*E0 , 1*E0, zeros(1,28)];
