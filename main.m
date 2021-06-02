@@ -327,3 +327,63 @@ hold off
 selez1 = (malati< (2*E0 + 1e-8) & malati > (2*E0 - 1e-8));
 t_radd1 = t(selez1)
 
+%% %% Prova del funzionale di costo
+options_lockdown= optimoptions('fmincon','Display','none','Algorithm','active-set',...
+    'OptimalityTolerance', 1e-5, 'MaxFunctionEvaluations', 5,'FunValCheck','on');
+
+%time1=0:1:N-nolockdown-1;
+% U0 = [zeros(nolockdown,1); 0.7.*ones(N-nolockdown,1).*(1-time1'./(N-nolockdown))];
+U0 = [zeros(nolockdown,1); 0.7*ones(N-nolockdown,1)];
+lb= zeros(N,1); % lower bounds
+ub= 0.9.*ones(N,1); % upper bounds
+
+tic
+[Uvec,fval,exitflag] = fmincon('cost_function',U0,[],[],[],[],lb,ub,[],options_lockdown);
+toc
+
+% evolution 
+Lvect = Uvec;
+[time, XFin] = ode45('gatto_vaccini_unico',time,x0);
+%
+figure(1)
+plot(time, Uvec)
+
+figure(2)
+plot(time, XFin(:,:))
+
+%% ora proviamo ad impostare l'ottimizzazione parametrica: tipo lockdown costante su tutta la finestra temporale
+
+options_lockdown= optimoptions('fmincon','Display','none','Algorithm','active-set',...
+    'OptimalityTolerance', 1e-8, 'FunValCheck','on');
+
+time1=0:1:N-nolockdown-1;
+% U0 = [zeros(nolockdown,1); 0.7.*ones(N-nolockdown,1).*(1-time1'./(N-nolockdown))];
+valori0 = [0,0];
+
+%costruisco un vettore di costanti tale da avere lockdownccostanti su 14 giorni
+for i = 0:14:N
+   valori0 = [valori0 , 0.7]; 
+end
+
+n = length(valori0);
+lb= zeros(n,1); % lower bounds
+ub= 0.9.*ones(n,1); % upper bounds
+
+tic
+[Uvec_param,fval,exitflag] = fmincon('cost_function_param',valori0,[],[],[],[],lb,ub,[]);
+toc
+%
+% evolution 
+Lvect = [];
+for i = 1:n;
+ Lvect = [Lvect,Uvec_param(i)*ones(1,14)]   ; 
+end
+
+
+% [time, XFin] = ode45('gatto_vaccini_unico',time,x0);
+% %
+figure(1)
+plot(time, Lvect(1:length(time)))
+
+% figure(2)
+% plot(time, XFin(:,:))
