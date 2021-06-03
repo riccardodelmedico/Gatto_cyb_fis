@@ -159,7 +159,7 @@ plot(t_tot, [x_vaccini_tot(:,2:end); x_vaccini_tot1(:,2:end)]) %visione restanti
  
 %rimettiamo allora R0 a 3.6
 parameters_vaccini 
-Lvect = [zeros(nolockdown,1); 0.473*ones(N-nolockdown,1) ];
+Lvect = [zeros(nolockdown,1); 0.48*ones(N-nolockdown,1) ];
 
 %rimettiamo le condizioni iniziali come prima
 x0= [1-1*E0 1*E0 zeros(1,22)];
@@ -354,9 +354,9 @@ plot(time, XFin(:,:))
 %% ora proviamo ad impostare l'ottimizzazione parametrica: tipo lockdown costante su tutta la finestra temporale
 
 options_lockdown= optimoptions('fmincon','Display','none','Algorithm','active-set',...
-    'OptimalityTolerance', 1e-8, 'FunValCheck','on');
+    'OptimalityTolerance', 1e-7, 'FunValCheck','on');
 
-time1=0:1:N-nolockdown-1;
+%time1=0:1:N-nolockdown-1;
 % U0 = [zeros(nolockdown,1); 0.7.*ones(N-nolockdown,1).*(1-time1'./(N-nolockdown))];
 valori0 = [0,0];
 
@@ -365,6 +365,14 @@ for i = 0:14:N
    valori0 = [valori0 , 0.7]; 
 end
 
+%prova eventuale scalatura di valori0
+% finestre = 1:length(valori0);
+% scala = (length(valori0)- finestre)/length(valori0);
+% valori0 = valori0.*scala;
+% 
+% plot(valori0)
+
+%
 n = length(valori0);
 lb= zeros(n,1); % lower bounds
 ub= 0.9.*ones(n,1); % upper bounds
@@ -379,11 +387,11 @@ for i = 1:n;
  Lvect = [Lvect,Uvec_param(i)*ones(1,14)]   ; 
 end
 
-
-% [time, XFin] = ode45('gatto_vaccini_unico',time,x0);
-% %
+%
+[time, XFin] = ode45('gatto_vaccini_unico',time,x0);
+% 
 figure(1)
 plot(time, Lvect(1:length(time)))
 
-% figure(2)
-% plot(time, XFin(:,:))
+figure(2)
+plot(time, XFin(:,:))
