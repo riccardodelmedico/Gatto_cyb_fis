@@ -1,5 +1,8 @@
 %%R0 NGM
+global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
+       alfaH gammaQ gammaA x0 N eff1 eff2 ef1 prima_d seconda_d Lvect NV
 parameters_vaccini;
+dati_vaccini;
 
 J0=zeros(4,4);
 T=zeros(4,4);
@@ -50,7 +53,7 @@ A*sol
 
 %% sperimentale
 
-%%
+options = odeset('RelTol',1e-7,'AbsTol',1e-8);
 
 %cercando il tasso di raddoppio seleziono tradd in t quando ho
 %tra gli espostiv E quando raggiungo 2*E0
@@ -165,18 +168,18 @@ t_radd_A = t(selez)
 
 %quindi vediamo la somma di tutti i componenti
 
-malati = E+P+I+A ;% domanda: ha senso aggiungere anche chi non trasmette?+ x_vaccini_tot(:, 6) + x_vaccini_tot(:, 7);
+malati = P+I+A ;% domanda: ha senso aggiungere anche chi non trasmette?E + x_vaccini_tot(:, 6) + x_vaccini_tot(:, 7);
 figure(5)
 plot(t, malati);
 hold on
-plot(t, 2*E0*4*ones(length(t)));
+plot(t, 2*E0*3*ones(length(t)));
 hold off
 
-selez = (malati< (2*4*E0 + 3e-8) & malati> (2*4*E0 - 3e-8));
+selez = (malati< (2*3*E0 + 3e-8) & malati> (2*3*E0 - 3e-8));
 t_radd_tot = t(selez)
 
 
-%%%% rifacciamo l'analisi del tasso di raddoppio nel nuovo modello per vedere se c'è stato un rallentamento 
+%% rifacciamo l'analisi del tasso di raddoppio nel nuovo modello per vedere se c'è stato un rallentamento 
 %causa cambio ipotes i sulle distribuzioni degli infetti (da esponenziale a gamma) 
 
 tic
@@ -203,23 +206,25 @@ t_radd = t(selez)
 %così rilevante?
 
 %vediamo che succede considerando anche i restanti malati, quindi gruppi
-%P,I, A, H e Q
-
+ % chi trasmette ossia P,I, A
+P = x_vaccini_tot(:,2);
+I = x_vaccini_tot(:,3);
+A = x_vaccini_tot(:,4);
 figure(4)
-malati = E + x_vaccini_tot(:,2) + x_vaccini_tot(:,4) + x_vaccini_tot(:,5) + x_vaccini_tot(:,6) + x_vaccini_tot(:,7) +...
-         x_vaccini_tot(:,8)+ x_vaccini_tot(:,9) +x_vaccini_tot(:,10) + x_vaccini_tot(:,11) + x_vaccini_tot(:,12) ;
+malati = P+I+A;
+figure(4)
 plot(t, malati);
 hold on
-plot(t, 2*E0*ones(length(t)));
+plot(t, 2*E0*3*ones(length(t)));
 hold off
 
-selez1 = (malati< (2*E0 + 1e-8) & malati > (2*E0 - 1e-8));
+selez1 = (malati< (2*E0*3 + 1e-8) & malati > (2*E0*3 - 1e-8));
 t_radd1 = t(selez1);
 
 %qui addirittura sembra essere rilevante solo se consideriamo tutti i
 %reparti
 
-%%
+%
 %% rifacciamo l'analisi del tasso di raddoppio nel nuovo modello per vedere se c'è stato un rallentamento 
 %causa cambio ipotes i sulle distribuzioni degli infetti (da esponenziale a gamma) 
 
