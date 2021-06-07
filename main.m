@@ -126,6 +126,79 @@ selez1 = (malati< (2*E0 + 1e-8) & malati > (2*E0 - 1e-8));
 t_radd1 = t(selez1)
 
 
+%% ora cerchiamo di capire che succede se cambio le condizioni iniziali
+
+%l'idea è metetre delle persone in tutti i compartimenti e vedere quando
+%raddoppiano
+
+x0 = [1-E0, E0*ones(1,8) zeros(1,15) ];
+
+%cercando il tasso di raddoppio seleziono tradd in t quando ho
+%tra gli espostiv E quando raggiungo 2*E0
+tic
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:0.1:5, x0,options); 
+toc
+
+
+figure(1)
+E = x_vaccini_tot(:,2);
+plot(t, E);
+hold on
+plot(t, 2*E0*ones(length(t)));
+hold off
+
+%calcolo tasso di raddoppio t_radd tramite selezioni dei valori di t, con
+%il vettore logico di selezione selez
+
+selez = (E< (2*E0 + 1e-8) & E > (2*E0 - 1e-8));
+t_radd_E = t(selez)
+
+%e così via vediamo le altre variabili
+
+figure(2)
+P = x_vaccini_tot(:,3);
+plot(t, P);
+hold on
+plot(t, 2*E0*ones(length(t)));
+hold off
+
+%calcolo tasso di raddoppio t_radd tramite selezioni dei valori di t, con
+%il vettore logico di selezione selez
+
+selez = (P< (2*E0 + 1e-8) & P > (2*E0 - 1e-8));
+t_radd_P = t(selez)
+
+%e così via per le altre variabili
+
+figure(3)
+I = x_vaccini_tot(:,4);
+plot(t, I);
+hold on
+plot(t, 2*E0*ones(length(t)));
+hold off
+
+%calcolo tasso di raddoppio t_radd tramite selezioni dei valori di t, con
+%il vettore logico di selezione selez
+
+selez = (I< (2*E0 + 1e-8) & I > (2*E0 - 1e-8));
+t_radd_I = t(selez)
+
+%anche se sembra che per raddoppiare ci voglia sempre più tempo
+
+figure(4)
+A = x_vaccini_tot(:,5);
+plot(t, A);
+hold on
+plot(t, 2*E0*ones(length(t)));
+hold off
+
+%calcolo tasso di raddoppio t_radd tramite selezioni dei valori di t, con
+%il vettore logico di selezione selez
+
+selez = (A< (2*E0 + 1e-8) & A > (2*E0 - 1e-8));
+t_radd_A = t(selez)
+
+
 %% ora cambiamo R0, così scalando tutto e vediamo come evolve il sistema
 % carichiamo i nuovi parametri dei vaccini 
 %(si potrebbe fare anche con il lockdown, ma così scaliamo direttamente R0 e i beta)
