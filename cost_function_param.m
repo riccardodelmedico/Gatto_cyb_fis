@@ -11,7 +11,7 @@ Lvect = [Lvect, Utry(i)*ones(14)];
 end
 
 
-options = odeset('RelTol',1e-7,'AbsTol',1e-7);
+options = odeset('RelTol',1e-9,'AbsTol',1e-9);
 t = 0:1:N-1;
 [tempo,x] = ode45('gatto_vaccini_unico',t,x0, options);
 
@@ -43,11 +43,18 @@ E2 = x(:,20); %esposti gruppo
 P2 = x(:,21); %presintomatici
 I2 = x(:,22); %infetti
 A2 = x(:,23); %asintomatici
-arg1=S+E+P+I+A+H+Q+S1+E1+P1+I1+A1+H1+Q1+S2+E2+P2+I2+A2;
-arg2= H+Q+H1+Q1;
-arg3 = D+D1;% si suppone che esposti, asint e infetti possano effettuare il loro 
-                    % lavoro in modalitÃ  remota, non andando a grave sul
-                    % costo totale
+arg1=S+E+P+I+A+S1+E1+P1+I1+A1+S2+E2+P2+I2+A2; %che va come costo di controllo,...
+                                              %%%poichè si impedisce a questa gente di lavroare
+
+
+arg2= H+Q+H1+Q1; %questo è il  costo dovuto alla gente isolata, 
+%%%ossia ocme perdita del PIl dovuto al fatto che abbiano contratto la
+%%%malattia causa ''lockdwon troppo leggero'', nel senso che è il termine
+%%%con cui entra in competizione il primo argomento
+ 
+arg3 = D+D1; %come l'argomento 2, solo che in questo caso aggiugiamo il costo xi 
+
+
 cost_function_value = sum( exp(-(r).*t').* ...
     (w.*L.*(ts.*(arg1) +1 -ts) +...
     arg2.*(w/r) + arg3.*(w/r + xi)) );
