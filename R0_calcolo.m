@@ -53,22 +53,30 @@ A*sol
 
 %% sperimentale
 
+global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
+       alfaH gammaQ gammaA x0 N eff1 eff2 ef1 prima_d seconda_d Lvect NV
+parameters_vaccini;
+dati_vaccini;
+
+
+Lvect = zeros(1,N);
+x0= [1-1*E0 1*E0 zeros(1,22)];
 options = odeset('RelTol',1e-7,'AbsTol',1e-8);
 
 %cercando il tasso di raddoppio seleziono tradd in t quando ho
 %tra gli espostiv E quando raggiungo 2*E0
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:0.1:5, x0,options); 
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:0.05:10, x0); 
 toc
 
 
-figure(3)
+figure(1)
 E = x_vaccini_tot(:,2);
 plot(t, E);
 hold on
 plot(t, 2*E0*ones(length(t)));
 hold off
-
+legend('Visione raddoppio esposti')
 %calcolo tasso di raddoppio t_radd tramite selezioni dei valori di t, con
 %il vettore logico di selezione selez
 
@@ -83,14 +91,15 @@ t_radd = t(selez)
 %vediamo che succede considerando anche i restanti malati, quindi gruppi
 %P,I, A, H e Q
 
-figure(4)
+figure(2)
 malati = E + x_vaccini_tot(:,3) + x_vaccini_tot(:,4) + x_vaccini_tot(:,5) + x_vaccini_tot(:,6) + x_vaccini_tot(:,7);
 plot(t, malati);
 hold on
 plot(t, 2*E0*ones(length(t)));
 hold off
+legend('Visione raddoppio malati totali')
 
-selez1 = (malati< (2*E0 + 1e-8) & malati > (2*E0 - 1e-8));
+selez1 = (malati< (2*E0 + 5e-8) & malati > (2*E0 - 5e-8));
 t_radd1 = t(selez1)
 
 
@@ -104,7 +113,7 @@ x0 = [1-E0, E0*ones(1,8) zeros(1,15) ];
 %cercando il tasso di raddoppio seleziono tradd in t quando ho
 %tra gli espostiv E quando raggiungo 2*E0
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:0.1:5, x0,options); 
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:0.02:7, x0,options); 
 toc
 
 
@@ -114,6 +123,7 @@ plot(t, E);
 hold on
 plot(t, 2*E0*ones(length(t)));
 hold off
+legend('Esposti')
 
 %calcolo tasso di raddoppio t_radd tramite selezioni dei valori di t, con
 %il vettore logico di selezione selez
@@ -129,6 +139,7 @@ plot(t, P);
 hold on
 plot(t, 2*E0*ones(length(t)));
 hold off
+legend('Paucisintomatici')
 
 %calcolo tasso di raddoppio t_radd tramite selezioni dei valori di t, con
 %il vettore logico di selezione selez
@@ -144,6 +155,7 @@ plot(t, I);
 hold on
 plot(t, 2*E0*ones(length(t)));
 hold off
+legend('Infetti')
 
 %calcolo tasso di raddoppio t_radd tramite selezioni dei valori di t, con
 %il vettore logico di selezione selez
@@ -159,6 +171,7 @@ plot(t, A);
 hold on
 plot(t, 2*E0*ones(length(t)));
 hold off
+legend('Asintomatici')
 
 %calcolo tasso di raddoppio t_radd tramite selezioni dei valori di t, con
 %il vettore logico di selezione selez
@@ -168,31 +181,46 @@ t_radd_A = t(selez)
 
 %quindi vediamo la somma di tutti i componenti
 
-malati = P+I+A ;% domanda: ha senso aggiungere anche chi non trasmette?E + x_vaccini_tot(:, 6) + x_vaccini_tot(:, 7);
+trasmettitori = P+I+A ;% domanda: ha senso aggiungere anche chi non trasmette?E + x_vaccini_tot(:, 6) + x_vaccini_tot(:, 7);
 figure(5)
-plot(t, malati);
+plot(t, trasmettitori);
 hold on
 plot(t, 2*E0*3*ones(length(t)));
 hold off
+legend('Trasmettitori (P,I,A)')
 
-selez = (malati< (2*3*E0 + 3e-8) & malati> (2*3*E0 - 3e-8));
-t_radd_tot = t(selez)
+selez = (trasmettitori< (2*3*E0 + 3e-8) & trasmettitori> (2*3*E0 - 3e-8));
+t_radd_trasm = t(selez)
+
+figure(6)
+malati = E + x_vaccini_tot(:,3) + x_vaccini_tot(:,4) + x_vaccini_tot(:,5) + x_vaccini_tot(:,6) + x_vaccini_tot(:,7);
+plot(t, malati);
+hold on
+plot(t, 2*E0*6*ones(length(t)));
+hold off
+legend('Malati totali (E,P,I,A,H,Q)')
+
+selez1 = (malati< (2*6*E0 + 5e-8) & malati > (2*6*E0 - 5e-8));
+t_radd_tot = t(selez1)
 
 
 %% rifacciamo l'analisi del tasso di raddoppio nel nuovo modello per vedere se c'è stato un rallentamento 
 %causa cambio ipotes i sulle distribuzioni degli infetti (da esponenziale a gamma) 
+global x0_casc
+x0_casc = [1-1*E0 , 1*E0, zeros(1,29)];
 
 tic
 [t,x_vaccini_tot]= ode45('gatto_vaccini_unico_cascate', 0:0.1:10, x0_casc,options); 
 toc
 
 %
-figure(3)
+figure(1)
 E = x_vaccini_tot(:,3);
 plot(t, E);
 hold on
 plot(t, 2*E0*ones(length(t)));
 hold off
+legend('Esposti (distrib. gamma)')
 
 %calcolo tasso di raddoppio t_radd tramite selezioni dei valori di t, con
 %il vettore logico di selezione selez
@@ -207,38 +235,52 @@ t_radd = t(selez)
 
 %vediamo che succede considerando anche i restanti malati, quindi gruppi
  % chi trasmette ossia P,I, A
-P = x_vaccini_tot(:,2);
-I = x_vaccini_tot(:,3);
-A = x_vaccini_tot(:,4);
-figure(4)
-malati = P+I+A;
-figure(4)
-plot(t, malati);
-hold on
-plot(t, 2*E0*3*ones(length(t)));
-hold off
+P = x_vaccini_tot(:,4);
+I = x_vaccini_tot(:,5);
+A = x_vaccini_tot(:,6);
 
-selez1 = (malati< (2*E0*3 + 1e-8) & malati > (2*E0*3 - 1e-8));
+
+trasmettitori = P+I+A;
+figure(2)
+plot(t, trasmettitori);
+hold on
+plot(t, 2*E0*ones(length(t)));
+hold off
+legend('Trasmettitori')
+
+selez1 = (trasmettitori< (2*E0 + 1e-8) & trasmettitori > (2*E0 - 1e-8));
 t_radd1 = t(selez1);
 
 %qui addirittura sembra essere rilevante solo se consideriamo tutti i
 %reparti
 
-%
+figure(3)
+malati = E+P+I+A+x_vaccini_tot(:,9)+x_vaccini_tot(:,10);
+plot(t, malati);
+hold on
+plot(t, 2*E0*ones(length(t)));
+hold off
+legend('Malati totali (E,P,I,A,H,Q)')
+
+selez1 = (malati< (2*E0 + 5e-8) & malati > (2*E0 - 5e-8));
+t_radd_tot = t(selez1)
 %% rifacciamo l'analisi del tasso di raddoppio nel nuovo modello per vedere se c'è stato un rallentamento 
 %causa cambio ipotes i sulle distribuzioni degli infetti (da esponenziale a gamma) 
+global x0_casc_inf
+x0_casc_inf = [1-1*E0 , 1*E0, zeros(1,28)];
 
 tic
 [t,x_vaccini_tot]= ode45('gatto_vaccini_unico_cascatesoloInfetti', 0:0.1:10, x0_casc_inf,options); 
 toc
 
 %
-figure(3)
-E = x_vaccini_tot(:,3);
+figure(1)
+E = x_vaccini_tot(:,2);
 plot(t, E);
 hold on
 plot(t, 2*E0*ones(length(t)));
 hold off
+legend('Esposti')
 
 %calcolo tasso di raddoppio t_radd tramite selezioni dei valori di t, con
 %il vettore logico di selezione selez
@@ -254,13 +296,25 @@ t_radd = t(selez)
 %vediamo che succede considerando anche i restanti malati, quindi gruppi
 %P,I, A, H e Q
 
-figure(4)
-malati = E + x_vaccini_tot(:,2) + x_vaccini_tot(:,4) + x_vaccini_tot(:,5) + x_vaccini_tot(:,6) + x_vaccini_tot(:,7) +...
-         x_vaccini_tot(:,8)+ x_vaccini_tot(:,9) +x_vaccini_tot(:,10) + x_vaccini_tot(:,11) ;
+figure(2)
+malati = E + x_vaccini_tot(:,3) + x_vaccini_tot(:,6) + x_vaccini_tot(:,7) +...
+         x_vaccini_tot(:,8)+ x_vaccini_tot(:,9);
 plot(t, malati);
 hold on
 plot(t, 2*E0*ones(length(t)));
 hold off
+legend('Malati')
 
 selez1 = (malati< (2*E0 + 1e-8) & malati > (2*E0 - 1e-8));
 t_radd1 = t(selez1)
+
+figure(3)
+trasmettitori = x_vaccini_tot(:,3) +  x_vaccini_tot(:,6) +  x_vaccini_tot(:,7);
+plot(t, trasmettitori);
+hold on
+plot(t, 2*E0*ones(length(t)));
+hold off
+legend('Trasmettitori')
+
+selez1 = (trasmettitori< (2*E0 + 5e-8) & trasmettitori > (2*E0 - 5e-8));
+t_radd_tot = t(selez1)
