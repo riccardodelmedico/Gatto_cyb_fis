@@ -30,8 +30,8 @@ I1 = x(:,13); %infetti
 A1 = x(:,14); %asintomatici
 H1 = x(:,15); %ospedalizzati
 Q1 = x(:,16); %quarantena casalinga
-R = x(:,17);
-D = x(:,18);
+R1 = x(:,17);
+D1 = x(:,18);
 S2 = x(:,19); %suscettibili
 E2 = x(:,20); %esposti gruppo
 P2 = x(:,21); %presintomatici
@@ -39,12 +39,12 @@ I2 = x(:,22); %infetti
 A2 = x(:,23); %asintomatici
 
 arg1=S+E+P+I+A+S1+E1+P1+I1+A1+S2+E2+P2+I2+A2; %che va come costo di controllo,
-                                              %%%poichè si impedisce a questa gente di lavroare
+                                              %%%poichÃ¨ si impedisce a questa gente di lavroare
 
 
-arg2= H+Q+H1+Q1; %questo è il  costo dovuto alla gente isolata, 
+arg2= H+Q+H1+Q1; %questo Ã¨ il  costo dovuto alla gente isolata, 
 %%%ossia ocme perdita del PIl dovuto al fatto che abbiano contratto la
-%%%malattia causa ''lockdwon troppo leggero'', nel senso che è il termine
+%%%malattia causa ''lockdwon troppo leggero'', nel senso che Ã¨ il termine
 %%%con cui entra in competizione il primo argomento
  
 arg3 = D+D1; %come l'argomento 2, solo che in questo caso aggiugiamo il costo xi 
