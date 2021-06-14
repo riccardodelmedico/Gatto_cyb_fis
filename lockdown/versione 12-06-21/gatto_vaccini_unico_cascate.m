@@ -81,9 +81,9 @@ xdot = zeros(31,1);
     xdot(26) = lambda*S2*(1-teta*L)^2 - deltaE*2*E21;
     xdot(27) = deltaE*2*E21 - deltaE*2*E22;
     xdot(28) = deltaE*E22 - deltaP*P2;
-    xdot(29) = sig*deltaP*P2 - gammaA*I2;
+    xdot(29) = sig*deltaP*P2 - gammaI*I2;
     xdot(30) = (1 - sig)*deltaP*P2 - gammaA*A2;
-    xdot(31) = gammaA*I2 + gammaA*A2;
+    xdot(31) = gammaI*I2 + gammaA*A2;
 
 
 end

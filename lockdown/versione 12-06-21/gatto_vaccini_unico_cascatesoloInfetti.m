@@ -76,11 +76,11 @@ xdot = zeros(30,1);
     xdot(23) = - lambda*S2*(1-teta*L)^2+eff2*seconda_dos;
     xdot(24) = lambda*S2*(1-teta*L)^2 - deltaE*E2;
     xdot(25) = deltaE*E2 - deltaP*P2;
-    xdot(26) = sig*deltaP*P2 - gammaA*3*I21;
-    xdot(27) = gammaA*3*I21 - gammaA*3*I22;
-    xdot(28) = gammaA*3*I22 - gammaA*3*I23;
+    xdot(26) = sig*deltaP*P2 - gammaI*3*I21;
+    xdot(27) = gammaI*3*I21 - gammaI*3*I22;
+    xdot(28) = gammaI*3*I22 - gammaI*3*I23;
     xdot(29) = (1 - sig)*deltaP*P2 - gammaA*A2;
-    xdot(30) = gammaA*I23 + gammaA*A2;
+    xdot(30) = gammaI*I23 + gammaA*A2;
 
 
 end

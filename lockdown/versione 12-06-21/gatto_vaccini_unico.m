@@ -66,9 +66,9 @@ xdot = zeros(24,1);
     xdot(19) = - lambda*S2*(1-teta*L)^2+eff2*seconda_dos;
     xdot(20) = lambda*S2*(1-teta*L)^2 - deltaE*E2;
     xdot(21) = deltaE*E2 - deltaP*P2;
-    xdot(22) = sig*deltaP*P2 - gammaA*I2;
+    xdot(22) = sig*deltaP*P2 - gammaI*I2;
     xdot(23) = (1 - sig)*deltaP*P2 - gammaA*A2;
-    xdot(24) = gammaA*I2 + gammaA*A2;
+    xdot(24) = gammaI*I2 + gammaA*A2;
 
 
 end
