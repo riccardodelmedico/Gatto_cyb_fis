@@ -2,7 +2,7 @@ function cost_function_value = cost_function_param(Utry)
 
 global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH alfaH ...
     gammaQ betaP betaA betaI N x0 eff1 eff2 ef1 prima_d seconda_d ...
-    Lvect teta
+    Lvect teta N_ott
 
 %costruisco Lvect di conseguenza al controllo
 Lvect = [];
@@ -12,7 +12,7 @@ end
 
 
 options = odeset('RelTol',1e-5,'AbsTol',1e-5);
-t = 0:1:N-1;
+t = 0:1:N_ott-1;
 [tempo,x] = ode45('gatto_vaccini_unico',t,x0, options);
 
 L = Lvect(fix(tempo)+1);

@@ -119,30 +119,32 @@ plot(t_tot, [x_vaccini_tot(:,1); x_vaccini_tot1(:,1)]) %visione suscettibili
 figure(3)
 plot(t_tot, [x_vaccini_tot(:,2:end); x_vaccini_tot1(:,2:end)]) %visione restanti
 
+%e aggiorniamo x0 per la soluzione del problema di controllo ottimo
 
+x0 = x_vaccini_tot1(end, :);
 
  %% equivalente scalatura di R0, assunto che il lockdown abbia contributo quadratico
  %semplicemente vogliamo una scalatura di 3.6 del termine lambda, tramite
  %la moltiplicazione di (1-L)^2 = 1/3.6=0.2777---->(1-L)= 0.527--->L = 0.473
  
 %rimettiamo allora R0 a 3.6
-parameters_vaccini;
-Lvect = [zeros(nolockdown,1); 0.48*ones(N-nolockdown,1) ];
-
-%rimettiamo le condizioni iniziali come prima
-x0= [1-1*E0 1*E0 zeros(1,22)];
-%x0= [1-1*E0 1*E0 zeros(1,24)];
-%risolviamo il Gatto senza vaccini per tutti i mesi prima dei vaccini
-tic
-[t1,x_vaccini_tot2]= ode45('gatto_vaccini_unico', 0:1:(novax+nolockdown-1), x0,options); 
-toc
-
-figure (1)
-t_tot = 0:1:(novax+nolockdown-1);
-plot(t_tot, x_vaccini_tot2(:,1))  % visione suscettibili
-
-figure(2)
-plot(t_tot, x_vaccini_tot2(:,2:end))  % visione restanti variabili gatto
+% parameters_vaccini;
+% Lvect = [zeros(nolockdown,1); 0.48*ones(N-nolockdown,1) ];
+% 
+% %rimettiamo le condizioni iniziali come prima
+% x0= [1-1*E0 1*E0 zeros(1,22)];
+% %x0= [1-1*E0 1*E0 zeros(1,24)];
+% %risolviamo il Gatto senza vaccini per tutti i mesi prima dei vaccini
+% tic
+% [t1,x_vaccini_tot2]= ode45('gatto_vaccini_unico', 0:1:(novax+nolockdown-1), x0,options); 
+% toc
+% 
+% figure (1)
+% t_tot = 0:1:(novax+nolockdown-1);
+% plot(t_tot, x_vaccini_tot2(:,1))  % visione suscettibili
+% 
+% figure(2)
+% plot(t_tot, x_vaccini_tot2(:,2:end))  % visione restanti variabili gatto
 
 
 %% ora introduciamo le cascate di Ode ma secondo il Gatto (su E e su H come a pagina 11)
@@ -219,18 +221,26 @@ legend('E2(t)','P2(t)', 'I12(t)','I22(t)','I23(t)', 'A2(t)', 'R2(t)')
 options_lockdown = optimoptions('fmincon','Display','iter-detailed','Algorithm','active-set','FunValCheck','on');
 %time1=0:1:N-nolockdown-1;
 % U0 = [zeros(nolockdown,1); 0.7.*ones(N-nolockdown,1).*(1-time1'./(N-nolockdown))];
-Lvect = zeros(1,N);
-U0 = [zeros(nolockdown,1); 0.7*ones(N-nolockdown,1)];
-lb= zeros(N,1); % lower bounds
-ub= 0.9.*ones(N,1); % upper bounds
 
+global N_ott;
+N_ott = N-nolockdown-novax; %che è 165
+prima_d = prima_dose_norm;
+seconda_d = seconda_dose_norm;
+
+
+Lvect = zeros(1,N_ott);
+U0 = [zeros(nolockdown,1); 0.7*ones(N_ott-nolockdown,1)];
+
+lb= zeros(N_ott,1); % lower bounds
+ub= 0.9.*ones(N_ott,1); % upper bounds
+%
 tic
 [Uvec,fval,exitflag] = fmincon('cost_function',U0,[],[],[],[],lb,ub,[],options_lockdown);
 toc
-
+t = 0:N_ott-1;
 % evolution 
 Lvect = Uvec;
-[time, XFin] = ode45('gatto_vaccini_unico',time,x0);
+[time, XFin] = ode45('gatto_vaccini_unico',t,x0);
 %
 figure(1)
 plot(time, Uvec)
@@ -241,14 +251,14 @@ plot(time, XFin(:,:))
 %% ora proviamo ad impostare l'ottimizzazione parametrica: tipo lockdown costante su tutta la finestra temporale
 
 options_lockdown= optimoptions('fmincon','Display','iter-detailed','Algorithm','active-set',...
-    'OptimalityTolerance', 1e-5, 'FunValCheck','on');
+     'FunValCheck','on');
 
 %time1=0:1:N-nolockdown-1;
 % U0 = [zeros(nolockdown,1); 0.7.*ones(N-nolockdown,1).*(1-time1'./(N-nolockdown))];
 valori0 = [0,0];
 
 %costruisco un vettore di costanti tale da avere lockdownccostanti su 14 giorni
-for i = 0:14:N
+for i = 1:14:N_ott
    valori0 = [valori0 , 0.7]; 
 end
 
@@ -273,9 +283,9 @@ Lvect = [];
 for i = 1:n;
  Lvect = [Lvect,Uvec_param(i)*ones(1,14)]   ; 
 end
-
 %
-[time, XFin] = ode45('gatto_vaccini_unico',time,x0);
+t = 0:N_ott-1 ;
+[time, XFin] = ode45('gatto_vaccini_unico',t,x0);
 % 
 figure(1)
 plot(time, Lvect(1:length(time)))
@@ -300,12 +310,12 @@ options = optimoptions('fmincon','Display','iter-detailed');
 tic
 [Uvec,fval,exitflag] =fmincon('cost_function_param_logi',U0,[],[],[],[],lb,ub,'nonlincon',options);
 toc
-
+t = 0:N_ott-1;
 % evolution 
 %Lvect= [zeros(nolockdown,1); 0.6*ones(novax,1); 0.3*ones(NV,1)];
-Lvect = Utime2par(Uvec,time);
+Lvect = Utime2par(Uvec,t);
 %Lvect= Uvec;
-[time, XFin] = ode45('gatto_vaccini_unico',time,x0);
+[time, XFin] = ode45('gatto_vaccini_unico',t,x0);
 
 %plots
 figure

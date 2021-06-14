@@ -2,9 +2,9 @@ function cost_function_value = cost_function(Utry)
 
 global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH alfaH ...
     gammaQ betaP betaA betaI N x0 eff1 eff2 ef1 prima_d seconda_d ...
-    Lvect teta
+    Lvect teta N_ott
 
-t = 0:1:N-1;
+t = 0:1:N_ott-1;
 Lvect = Utime2par(Utry,t);
 %options = odeset('RelTol',1e-8,'AbsTol',1e-10);
 
