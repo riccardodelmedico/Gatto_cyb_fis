@@ -68,7 +68,7 @@ x0= [1-1*E0 1*E0 zeros(1,22)];
 %di raddoppio dell'epidemia libera
 
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:1:N-1, x0,options); 
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:1:nolockdown+novax-1, x0,options); 
 toc
 
 figure(1)
@@ -156,7 +156,7 @@ Lvect= [zeros(nolockdown,1); 0.4*ones(novax,1); 0.4*ones(NV,1)]; %si suppone che
 x0_casc = [1-1*E0 , 1*E0, zeros(1,29)];
 options = odeset('RelTol',1e-8,'AbsTol',1e-10);
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico_cascate', 0:1:nolockdown+novax+NV-1, x0_casc,options); 
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico_cascate', 0:1:nolockdown+novax-1, x0_casc,options); 
 toc
 
 figure(1)
@@ -213,75 +213,75 @@ plot(t, x_vaccini_tot(:,23:30))
 legend('E2(t)','P2(t)', 'I12(t)','I22(t)','I23(t)', 'A2(t)', 'R2(t)')
 
 
-% %% %% Prova del funzionale di costo
-% %options_lockdown= optimoptions('fmincon','Display','none','Algorithm','active-set',...
-%  %   'OptimalityTolerance', 1e-5, 'MaxFunctionEvaluations', 5,'FunValCheck','on');
-% options_lockdown = optimoptions('fmincon','Display','iter-detailed','Algorithm','active-set','FunValCheck','on');
-% %time1=0:1:N-nolockdown-1;
-% % U0 = [zeros(nolockdown,1); 0.7.*ones(N-nolockdown,1).*(1-time1'./(N-nolockdown))];
-% Lvect = zeros(1,N);
-% U0 = [zeros(nolockdown,1); 0.7*ones(N-nolockdown,1)];
-% lb= zeros(N,1); % lower bounds
-% ub= 0.9.*ones(N,1); % upper bounds
-% 
-% tic
-% [Uvec,fval,exitflag] = fmincon('cost_function',U0,[],[],[],[],lb,ub,[],options_lockdown);
-% toc
-% 
-% % evolution 
-% Lvect = Uvec;
-% [time, XFin] = ode45('gatto_vaccini_unico',time,x0);
-% %
-% figure(1)
-% plot(time, Uvec)
-% 
-% figure(2)
-% plot(time, XFin(:,:))
+%% %% Prova del funzionale di costo
+%options_lockdown= optimoptions('fmincon','Display','none','Algorithm','active-set',...
+ %   'OptimalityTolerance', 1e-5, 'MaxFunctionEvaluations', 5,'FunValCheck','on');
+options_lockdown = optimoptions('fmincon','Display','iter-detailed','Algorithm','active-set','FunValCheck','on');
+%time1=0:1:N-nolockdown-1;
+% U0 = [zeros(nolockdown,1); 0.7.*ones(N-nolockdown,1).*(1-time1'./(N-nolockdown))];
+Lvect = zeros(1,N);
+U0 = [zeros(nolockdown,1); 0.7*ones(N-nolockdown,1)];
+lb= zeros(N,1); % lower bounds
+ub= 0.9.*ones(N,1); % upper bounds
+
+tic
+[Uvec,fval,exitflag] = fmincon('cost_function',U0,[],[],[],[],lb,ub,[],options_lockdown);
+toc
+
+% evolution 
+Lvect = Uvec;
+[time, XFin] = ode45('gatto_vaccini_unico',time,x0);
+%
+figure(1)
+plot(time, Uvec)
+
+figure(2)
+plot(time, XFin(:,:))
 
 %% ora proviamo ad impostare l'ottimizzazione parametrica: tipo lockdown costante su tutta la finestra temporale
 
-% options_lockdown= optimoptions('fmincon','Display','none','Algorithm','active-set',...
-%     'OptimalityTolerance', 1e-7, 'FunValCheck','on');
-% 
-% %time1=0:1:N-nolockdown-1;
-% % U0 = [zeros(nolockdown,1); 0.7.*ones(N-nolockdown,1).*(1-time1'./(N-nolockdown))];
-% valori0 = [0,0];
-% 
-% %costruisco un vettore di costanti tale da avere lockdownccostanti su 14 giorni
-% for i = 0:14:N
-%    valori0 = [valori0 , 0.7]; 
-% end
+options_lockdown= optimoptions('fmincon','Display','iter-detailed','Algorithm','active-set',...
+    'OptimalityTolerance', 1e-5, 'FunValCheck','on');
+
+%time1=0:1:N-nolockdown-1;
+% U0 = [zeros(nolockdown,1); 0.7.*ones(N-nolockdown,1).*(1-time1'./(N-nolockdown))];
+valori0 = [0,0];
+
+%costruisco un vettore di costanti tale da avere lockdownccostanti su 14 giorni
+for i = 0:14:N
+   valori0 = [valori0 , 0.7]; 
+end
 
 %prova eventuale scalatura di valori0
-% finestre = 1:length(valori0);
-% scala = (length(valori0)- finestre)/length(valori0);
-% valori0 = valori0.*scala;
-% 
-% plot(valori0)
+finestre = 1:length(valori0);
+scala = (length(valori0)- finestre)/length(valori0);
+valori0 = valori0.*scala;
+
+plot(valori0)
+
+
+n = length(valori0);
+lb= zeros(n,1); % lower bounds
+ub= 0.9.*ones(n,1); % upper bounds
+
+tic
+[Uvec_param,fval,exitflag] = fmincon('cost_function_param',valori0,[],[],[],[],lb,ub,[]);
+toc
+%
+% evolution 
+Lvect = [];
+for i = 1:n;
+ Lvect = [Lvect,Uvec_param(i)*ones(1,14)]   ; 
+end
 
 %
-% n = length(valori0);
-% lb= zeros(n,1); % lower bounds
-% ub= 0.9.*ones(n,1); % upper bounds
+[time, XFin] = ode45('gatto_vaccini_unico',time,x0);
 % 
-% tic
-% [Uvec_param,fval,exitflag] = fmincon('cost_function_param',valori0,[],[],[],[],lb,ub,[]);
-% toc
-% %
-% % evolution 
-% Lvect = [];
-% for i = 1:n;
-%  Lvect = [Lvect,Uvec_param(i)*ones(1,14)]   ; 
-% end
-% 
-% %
-% [time, XFin] = ode45('gatto_vaccini_unico',time,x0);
-% % 
-% figure(1)
-% plot(time, Lvect(1:length(time)))
-% 
-% figure(2)
-% plot(time, XFin(:,:))
+figure(1)
+plot(time, Lvect(1:length(time)))
+
+figure(2)
+plot(time, XFin(:,:))
 
 
 %% logistiche 
@@ -298,7 +298,7 @@ ub = [0.9 1 N-1 0.9 1 N-1];
 
 options = optimoptions('fmincon','Display','iter-detailed');
 tic
-[Uvec,fval,exitflag] =fmincon('cost_function',U0,[],[],[],[],lb,ub,'nonlincon',options);
+[Uvec,fval,exitflag] =fmincon('cost_function_param_logi',U0,[],[],[],[],lb,ub,'nonlincon',options);
 toc
 
 % evolution 
