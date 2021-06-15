@@ -67,7 +67,52 @@ step = 0.1;
 %cercando il tasso di raddoppio seleziono tradd in t quando ho
 %tra gli espostiv E quando raggiungo 2*E0
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:step:15, x0); 
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:step:25, x0); 
+toc
+
+%VEDERE CHE CAZZO VUOLE E PERCHè DA I DATI NEGATIVI, QUESTA SEZIONE è
+%L'UNICA PROBLEMATICA PER QUESTO FATTO ED è L'UNICA CHE FA CASINO
+%ALL'INIZIO
+
+E = x_vaccini_tot(:,2);
+P = x_vaccini_tot(:,3);
+I = x_vaccini_tot(:,4);
+A = x_vaccini_tot(:,5);
+
+figure(1)
+plot(t, log(E))
+hold on
+plot(t,log(P))
+plot(t,log(I))
+plot(t,log(A))
+hold off
+legend('E', 'P','I', 'A')
+
+figure(2)
+plot(t,[E P I A])
+
+%calcolo il tasso esponenziale di crescita delle curve come coefficiente angolare delle curve logaritmiche a regime, 
+%che poi uso per il tempo di raddoppio--->problema: come collego Rt al
+%coefficiente angolare? NON SI PUò FARE ANALITICAMENTE
+
+tasso_expo = (log(P(end)) - log(P(end-1)))/step
+t_radd = log(2)/tasso_expo
+
+%% ritaratura R0, mettendo il tempo di raddoppio a CIRCA 3, A ''OCCHIO''
+
+parameters_vaccini_R0_raddoppio;
+dati_vaccini;
+
+
+Lvect = zeros(1,N);
+x0= [1-1*E0 1*E0 zeros(1,22)];
+options = odeset('RelTol',1e-9,'AbsTol',1e-9);
+
+step = 0.1;
+%cercando il tasso di raddoppio seleziono tradd in t quando ho
+%tra gli espostiv E quando raggiungo 2*E0
+tic
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:step:25, x0); 
 toc
 
 %VEDERE CHE CAZZO VUOLE E PERCHè DA I DATI NEGATIVI, QUESTA SEZIONE è
@@ -95,51 +140,61 @@ plot(t,[E P I A])
 %che poi uso per il tempo di raddoppio--->problema: come collego Rt al
 %coefficiente angolare?
 
-tasso_expo = (log(P(end)) - log(P(end-1)))/step
-t_radd = log(2)/tasso_expo
+tasso_expo1 = (log(P(end)) - log(P(end-1)))/step
+t_radd1 = log(2)/tasso_expo1
+
+%OSS: NON SERVE CAMBIARE LE CONDIZIONI INIZIALI SE CI INTERESSA
+%L'EVOLUZIONE ESPONENZIALE DOPO UN PO' DI TEMPO (UNA SPECIE DI REGIME INIZIALE)
+% %% ora cerchiamo di capire che succede se cambio le condizioni iniziali
+% 
+% %l'idea è metetre delle persone in tutti i compartimenti e vedere quando
+% %raddoppiano
+% 
+% x0 = [1-E0, E0*ones(1,8) zeros(1,15) ];
+% 
+% step = 0.5;
+% %cercando il tasso di raddoppio seleziono tradd in t quando ho
+% %tra gli espostiv E quando raggiungo 2*E0
+% tic
+% [t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:step:30, x0,options); 
+% toc
+% 
+% 
+% 
+% % facciamo i plot logaritmici tanto dobbiamo vedere il funzionamento a
+% % regime dell'epidemia, in maniera esponenziale
+% E = x_vaccini_tot(:,2);
+% P = x_vaccini_tot(:,3);
+% I = x_vaccini_tot(:,4);
+% A = x_vaccini_tot(:,5);
+% 
+% 
+% figure(3)
+% plot(t, log(E))
+% hold on
+% plot(t,log(P))
+% plot(t,log(I))
+% plot(t,log(A))
+% hold off
+% legend('E', 'P','I', 'A')
+% 
+% figure(4)
+% plot(t,[E P I A])
+% 
+% tasso_expo = (log(E(end)) - log(E(end-1)))/step
+% t_radd = log(2)/tasso_expo
 
 
-%% ora cerchiamo di capire che succede se cambio le condizioni iniziali
-
-%l'idea è metetre delle persone in tutti i compartimenti e vedere quando
-%raddoppiano
-
-x0 = [1-E0, E0*ones(1,8) zeros(1,15) ];
-
-step = 0.5;
-%cercando il tasso di raddoppio seleziono tradd in t quando ho
-%tra gli espostiv E quando raggiungo 2*E0
-tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:step:30, x0,options); 
-toc
-
-
-
-% facciamo i plot logaritmici tanto dobbiamo vedere il funzionamento a
-% regime dell'epidemia, in maniera esponenziale
-E = x_vaccini_tot(:,2);
-P = x_vaccini_tot(:,3);
-I = x_vaccini_tot(:,4);
-A = x_vaccini_tot(:,5);
-
-
-figure(3)
-plot(t, log(E))
-hold on
-plot(t,log(P))
-plot(t,log(I))
-plot(t,log(A))
-hold off
-legend('E', 'P','I', 'A')
-
-figure(4)
-plot(t,[E P I A])
-
-tasso_expo = (log(E(end)) - log(E(end-1)))/step
-t_radd = log(2)/tasso_expo
 
 %% rifacciamo l'analisi del tasso di raddoppio nel nuovo modello per vedere se c'è stato un rallentamento 
 %causa cambio ipotes i sulle distribuzioni degli infetti (da esponenziale a gamma) 
+
+%rifacciamo lo studio originale
+
+parameters_vaccini
+dati_vaccini
+
+
 global x0_casc
 x0_casc = [1-1*E0 , 1*E0, zeros(1,29)];
 step = 0.1;
@@ -169,6 +224,8 @@ plot(t,[E P I A])
 
 tasso_expo = (log(P(end)) - log(P(end-1)))/step
 t_radd = log(2)/tasso_expo
+
+
 
 %% rifacciamo l'analisi del tasso di raddoppio nel nuovo modello per vedere se c'è stato un rallentamento 
 %causa cambio ipotes i sulle distribuzioni degli infetti (da esponenziale a gamma) 
