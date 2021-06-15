@@ -123,7 +123,7 @@ plot(t_tot, [x_vaccini_tot(:,2:end); x_vaccini_tot1(:,2:end)]) %visione restanti
 
 x0 = x_vaccini_tot1(end, :);
 
- %% equivalente scalatura di R0, assunto che il lockdown abbia contributo quadratico
+ %equivalente scalatura di R0, assunto che il lockdown abbia contributo quadratico
  %semplicemente vogliamo una scalatura di 3.6 del termine lambda, tramite
  %la moltiplicazione di (1-L)^2 = 1/3.6=0.2777---->(1-L)= 0.527--->L = 0.473
  
@@ -153,7 +153,7 @@ global x0_casc
 parameters_vaccini;
 dati_vaccini;
 
-Lvect= [zeros(nolockdown,1); 0.4*ones(novax,1); 0.4*ones(NV,1)]; %si suppone che il lockdown
+Lvect= [zeros(nolockdown,1); 0*ones(novax,1); 0*ones(NV,1)]; %si suppone che il lockdown
 %duri a partire dal 18esimo giorno e termini il giorno in cui cominciano le
 %vaccinazioni
 x0_casc = [1-1*E0 , 1*E0, zeros(1,29)];
@@ -175,15 +175,6 @@ plot(t, x_vaccini_tot (:, 1)) %visione suscettibili 1 gatto
 figure(4)
 plot(t, x_vaccini_tot(:,2:12)) %altre variabili 1 gatto
 legend('E1(t)','E2(t)', 'P(t)', 'I(t)', 'A(t)', 'H1(t)','H2(t)','H3(t)', 'Q(t)', 'R(t)', 'D(t)')
-
-figure(5) %altre variabili 2 gatto
-plot(t, x_vaccini_tot(:,14:24))
-legend('E1(t)','E2(t)', 'P(t)', 'I(t)', 'A(t)', 'H1(t)','H2(t)','H3(t)', 'Q(t)', 'R(t)', 'D(t)')
-
-figure(6) %altre variabili 3 gatto
-plot(t, x_vaccini_tot(:,26:31))
-legend('E21(t)','E22(t)', 'P2(t)', 'I2(t)', 'A2(t)','R2(t)')
-
 
 %% ora facciamo la cascata di 3 ode su infetti come suggerito da manfredi
 options = odeset('RelTol',1e-8,'AbsTol',1e-10);
@@ -212,10 +203,6 @@ figure(4) %altre variabili 2 gatto
 plot(t, x_vaccini_tot(:,13:22))
 legend('E1(t)','P1(t)', 'I13(t)', 'A1(t)', 'H1(t)', 'Q1(t)', 'R1(t)', 'D1(t)')
 
-figure(5) %altre variabili 3 gatto
-plot(t, x_vaccini_tot(:,23:30))
-legend('E2(t)','P2(t)', 'I12(t)','I22(t)','I23(t)', 'A2(t)', 'R2(t)')
-
 
 %% %% Prova del funzionale di costo
 %options_lockdown= optimoptions('fmincon','Display','none','Algorithm','active-set',...
@@ -236,13 +223,20 @@ xi=0;
 w=65000;
 t_ott = 0:1:N_ott-1;
 
+%siccome stiamo parlando del rilascio di lockdown, non ci interessa partire
+%con valore di L a 0
 
 Lvect = zeros(1,N_ott);
-U0 = [zeros(nolockdown,1); 0.7*ones(N_ott-nolockdown,1)];
+U0 = [0.7*ones(N_ott,1)];
 
 lb= zeros(N_ott,1); % lower bounds
 ub= 0.9.*ones(N_ott,1); % upper bounds
+
+%ed attenzione che devo aggiornare il modello affinchè l'epidemia viaggi
+%con tempo di raddoppio circa 3, settando qui R0 a 2.3
 %
+parameters_vaccini_R0_raddoppio;
+
 tic
 [Uvec,fval,exitflag] = fmincon('cost_function',U0,[],[],[],[],lb,ub,[],options_lockdown);
 toc
@@ -258,6 +252,12 @@ figure(2)
 plot(time, XFin(:,:))
 
 %% ora proviamo ad impostare l'ottimizzazione parametrica: tipo lockdown costante su tutta la finestra temporale
+%come prima aggiustando R0 per avere il tasso di raddoppio richiesto
+
+%anche qui scalare nellos script R0 ai valori corrispondenti al tasso di
+%raddoppio voluto
+
+parameters_vaccini_R0_raddoppio;
 
 global N_ott;
 N_ott = N-nolockdown-novax; %che è 165
@@ -276,11 +276,13 @@ options_lockdown= optimoptions('fmincon','Display','iter-detailed','Algorithm','
 
 %time1=0:1:N-nolockdown-1;
 % U0 = [zeros(nolockdown,1); 0.7.*ones(N-nolockdown,1).*(1-time1'./(N-nolockdown))];
-valori0 = [0,0];
+%come sopra non avrebbe molto senso parlare di condizione con 0 lockdown
+%per cui diamo come condizione iniziale un valore per cui Rt circa = 1
+valori0 = 0.1;
 
 %costruisco un vettore di costanti tale da avere lockdownccostanti su 14 giorni
 for i = 1:14:N_ott
-   valori0 = [valori0 , 0]; 
+   valori0 = [valori0 , 0.1]; 
 end
 
 % %prova eventuale scalatura di valori0
