@@ -151,6 +151,7 @@ x0 = x_vaccini_tot1(end, :);
 global x0_casc
 
 parameters_vaccini;
+dati_vaccini;
 
 Lvect= [zeros(nolockdown,1); 0.4*ones(novax,1); 0.4*ones(NV,1)]; %si suppone che il lockdown
 %duri a partire dal 18esimo giorno e termini il giorno in cui cominciano le
@@ -158,7 +159,7 @@ Lvect= [zeros(nolockdown,1); 0.4*ones(novax,1); 0.4*ones(NV,1)]; %si suppone che
 x0_casc = [1-1*E0 , 1*E0, zeros(1,29)];
 options = odeset('RelTol',1e-8,'AbsTol',1e-10);
 tic
-[tc,x_vaccini_tot]= ode45('gatto_vaccini_unico_cascate', 0:1:nolockdown+novax-1, x0_casc,options); 
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico_cascate', 0:1:nolockdown+novax-1, x0_casc,options); 
 toc
 
 figure(1)
@@ -187,10 +188,11 @@ legend('E21(t)','E22(t)', 'P2(t)', 'I2(t)', 'A2(t)','R2(t)')
 %% ora facciamo la cascata di 3 ode su infetti come suggerito da manfredi
 options = odeset('RelTol',1e-8,'AbsTol',1e-10);
 global x0_casc_inf
-Lvect= [zeros(nolockdown,1); 0.6*ones(novax,1); 0.3*ones(NV,1)]; %si suppone che il lockdown
+Lvect= [zeros(nolockdown,1); 0*ones(novax,1); 0*ones(NV,1)]; %si suppone che il lockdown
 %duri a partire dal 18esimo giorno e termini il giorno in cui cominciano le
 %vaccinazioni
-x0_casc_inf = [1-1*E0 , 1*E0, zeros(1,28)];
+x0_casc_inf = [1-1*E0 , 1*E0, zeros(1,40)];
+time = 0:1:novax+nolockdown-1;
 tic
 [t,x_vaccini_tot]= ode45('gatto_vaccini_unico_cascatesoloInfetti', time, x0_casc_inf,options); 
 toc
@@ -257,6 +259,18 @@ plot(time, XFin(:,:))
 
 %% ora proviamo ad impostare l'ottimizzazione parametrica: tipo lockdown costante su tutta la finestra temporale
 
+global N_ott;
+N_ott = N-nolockdown-novax; %che è 165
+prima_d = prima_dose_norm;
+seconda_d = seconda_dose_norm;
+
+global r ts xi w t_ott
+r=0.05;
+ts=1;
+xi=0;
+w=65000;
+t_ott = 0:1:N_ott-1;
+
 options_lockdown= optimoptions('fmincon','Display','iter-detailed','Algorithm','active-set',...
      'FunValCheck','on');
 
@@ -266,19 +280,21 @@ valori0 = [0,0];
 
 %costruisco un vettore di costanti tale da avere lockdownccostanti su 14 giorni
 for i = 1:14:N_ott
-   valori0 = [valori0 , 0.7]; 
+   valori0 = [valori0 , 0]; 
 end
 
-%prova eventuale scalatura di valori0
-finestre = 1:length(valori0);
-scala = (length(valori0)- finestre)/length(valori0);
-valori0 = valori0.*scala;
+% %prova eventuale scalatura di valori0
+% finestre = 1:length(valori0);
+% scala = (length(valori0)- finestre)/length(valori0);
+% valori0 = valori0.*scala;
 
-plot(valori0)
+% plot(valori0)
 
-
+%
 n = length(valori0);
-lb= zeros(n,1); % lower bounds
+lb= -0.00001*ones(n,1); % lower bounds lo mettiamo negativo leggermente 
+%per fare in modo che sia verificata strettamente la disuguglianza
+
 ub= 0.9.*ones(n,1); % upper bounds
 
 tic
