@@ -6,16 +6,17 @@ global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
 %R0 = 2.3 per una via di mezzo, con tempo raddoppio pari a 3
 
 %i seguenti per il modello realistico del gatto (cascate E,H)
-%R0 = 4.6 per tempo raddoppio pari a 3.5
-%R0 = 5.1 per tempo raddoppio pari a 3
-%R0 = 5.9 per tempo raddoppio pari a 2.5
+%R0 = 2.3 per tempo raddoppio pari a 3.5
+%R0 = 2.6  per tempo raddoppio pari a 3
+%R0 = 2.95 per tempo raddoppio pari a 2.5
 
-%per il modello realistico di Manfredi (cascate E,I,A) invece abbiamo già
-%un tempo di raddoppio pari a 3.27 circa, che potrebbe andare bene
+%per il modello realistico di Manfredi (cascate E,I,A) 
+%R0 = 2.58 per raddoppio pari a circa 3.5
+%R0 = 3.3 per raddoppio a circa 2.5
+%R0 = 2.9 per una via di mezzo, con tempo raddoppio pari a 3
 
 
-
-R0=5.9;
+R0=2.3;
 deltaE= 1 / 3.32;
 deltaP= 1 / 0.75;
 eta= 1 / 4.05;

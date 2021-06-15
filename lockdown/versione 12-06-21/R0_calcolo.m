@@ -297,5 +297,37 @@ plot(t,[E P I A])
 tasso_expo = (log(P(end)) - log(P(end-1)))/step
 t_radd = log(2)/tasso_expo
 
-%e va benissimo così sembra, visto che il tempo di raddoppio è 3.3
+%% ritariamo anche questo
+
+parameters_vaccini_R0_raddoppio
+
+global x0_casc_inf
+x0_casc_inf = [1-1*E0 , 1*E0, zeros(1,40)];
+
+step = 0.3;
+tic
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico_cascatesoloInfetti', 0:step:25, x0_casc_inf,options); 
+toc
+
+E = x_vaccini_tot(:,2);
+P = x_vaccini_tot(:,3);
+I = x_vaccini_tot(:,6);
+A = x_vaccini_tot(:,7);
+
+
+figure(7)
+plot(t, log(E))
+hold on
+plot(t,log(P))
+plot(t,log(I))
+plot(t,log(A))
+hold off
+legend('E', 'P','I', 'A')
+
+
+figure(8)
+plot(t,[E P I A])
+
+tasso_expo = (log(P(end)) - log(P(end-1)))/step
+t_radd = log(2)/tasso_expo
 
