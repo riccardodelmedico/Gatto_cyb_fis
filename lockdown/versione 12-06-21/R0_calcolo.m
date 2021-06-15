@@ -55,6 +55,7 @@ A*sol
 
 global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
        alfaH gammaQ gammaA x0 N eff1 eff2 ef1 prima_d seconda_d Lvect NV
+
 parameters_vaccini;
 dati_vaccini;
 
@@ -67,7 +68,7 @@ step = 0.1;
 %cercando il tasso di raddoppio seleziono tradd in t quando ho
 %tra gli espostiv E quando raggiungo 2*E0
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:step:25, x0); 
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:step:15, x0); 
 toc
 
 %VEDERE CHE CAZZO VUOLE E PERCHè DA I DATI NEGATIVI, QUESTA SEZIONE è
@@ -112,7 +113,7 @@ step = 0.1;
 %cercando il tasso di raddoppio seleziono tradd in t quando ho
 %tra gli espostiv E quando raggiungo 2*E0
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:step:25, x0); 
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:step:18, x0); 
 toc
 
 %VEDERE CHE CAZZO VUOLE E PERCHè DA I DATI NEGATIVI, QUESTA SEZIONE è
@@ -225,12 +226,49 @@ plot(t,[E P I A])
 tasso_expo = (log(P(end)) - log(P(end-1)))/step
 t_radd = log(2)/tasso_expo
 
+%% cerchiamo di tarare allora 
+parameters_vaccini_R0_raddoppio
+dati_vaccini
+
+
+global x0_casc
+x0_casc = [1-1*E0 , 1*E0, zeros(1,29)];
+step = 0.1;
+
+tic
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico_cascate', 0:step:25, x0_casc,options); 
+toc
+%ricorda che qui su E abbiamo la distribuzione gamma a due compartimenti
+
+E = x_vaccini_tot(:,3);
+P = x_vaccini_tot(:,4);
+I = x_vaccini_tot(:,5);
+A = x_vaccini_tot(:,6);
+
+
+figure(5)
+plot(t, log(E))
+hold on
+plot(t,log(P))
+plot(t,log(I))
+plot(t,log(A))
+hold off
+legend('E', 'P','I', 'A')
+
+figure(6)
+plot(t,[E P I A])
+
+tasso_expo = (log(P(end)) - log(P(end-1)))/step
+t_radd = log(2)/tasso_expo
+
 
 
 %% rifacciamo l'analisi del tasso di raddoppio nel nuovo modello per vedere se c'è stato un rallentamento 
 %causa cambio ipotes i sulle distribuzioni degli infetti (da esponenziale a gamma) 
+parameters_vaccini
+
 global x0_casc_inf
-x0_casc_inf = [1-1*E0 , 1*E0, zeros(1,28)];
+x0_casc_inf = [1-1*E0 , 1*E0, zeros(1,40)];
 
 step = 0.3;
 tic
@@ -258,3 +296,6 @@ plot(t,[E P I A])
 
 tasso_expo = (log(P(end)) - log(P(end-1)))/step
 t_radd = log(2)/tasso_expo
+
+%e va benissimo così sembra, visto che il tempo di raddoppio è 3.3
+
