@@ -68,18 +68,18 @@ x0= [1-1*E0 1*E0 zeros(1,22)];
 %di raddoppio dell'epidemia libera
 
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:1:nolockdown+novax-1, x0,options); 
+[t0,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:1:nolockdown+novax-1, x0,options); 
 toc
 
 figure(1)
-plot(t, x_vaccini_tot(:,1)) %plot totale
+plot(t0, x_vaccini_tot(:,1)) %plot totale
 
 % figure(2)
 % plot(t, x_vaccini_tot(:,[1 10 19])) %visione suscettibili
 % legend('S(t)','S1(t)','S2(t)')
 %
 figure(2)
-plot(t, x_vaccini_tot(:,2:9)) %altre variabili 1 gatto
+plot(t0, x_vaccini_tot(:,2:9)) %altre variabili 1 gatto
 legend('E(t)', 'P(t)', 'I(t)', 'A(t)', 'H(t)', 'Q(t)', 'R(t)', 'D(t)')
 %
 % figure(4) %altre variabili 2 gatto
@@ -94,11 +94,11 @@ legend('E(t)', 'P(t)', 'I(t)', 'A(t)', 'H(t)', 'Q(t)', 'R(t)', 'D(t)')
 % carichiamo i nuovi parametri dei vaccini 
 %(si potrebbe fare anche con il lockdown, ma così scaliamo direttamente R0 e i beta)
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:1:nolockdown-1, x0,options); 
+[t0,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:1:nolockdown-1, x0,options); 
 toc
 
 figure(1)
-plot(t, x_vaccini_tot(:,2:9)) %altre variabili 1 gatto
+plot(t0, x_vaccini_tot(:,2:9)) %altre variabili 1 gatto
 legend('E(t)', 'P(t)', 'I(t)', 'A(t)', 'H(t)', 'Q(t)', 'R(t)', 'D(t)')
 
 parameters_vaccini_R0_1;
@@ -158,7 +158,7 @@ Lvect= [zeros(nolockdown,1); 0.4*ones(novax,1); 0.4*ones(NV,1)]; %si suppone che
 x0_casc = [1-1*E0 , 1*E0, zeros(1,29)];
 options = odeset('RelTol',1e-8,'AbsTol',1e-10);
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico_cascate', 0:1:nolockdown+novax-1, x0_casc,options); 
+[tc,x_vaccini_tot]= ode45('gatto_vaccini_unico_cascate', 0:1:nolockdown+novax-1, x0_casc,options); 
 toc
 
 figure(1)
@@ -226,6 +226,13 @@ global N_ott;
 N_ott = N-nolockdown-novax; %che è 165
 prima_d = prima_dose_norm;
 seconda_d = seconda_dose_norm;
+
+global r ts xi w t_ott
+r=0.05;
+ts=1;
+xi=0;
+w=65000;
+t_ott = 0:1:N_ott-1;
 
 
 Lvect = zeros(1,N_ott);

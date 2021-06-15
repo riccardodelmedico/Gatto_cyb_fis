@@ -2,7 +2,7 @@ function cost_function_value = cost_function_param(Utry)
 
 global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH alfaH ...
     gammaQ betaP betaA betaI N x0 eff1 eff2 ef1 prima_d seconda_d ...
-    Lvect teta N_ott
+    Lvect teta N_ott r ts xi w t_ott
 
 %costruisco Lvect di conseguenza al controllo
 Lvect = [];
@@ -12,15 +12,15 @@ end
 
 
 options = odeset('RelTol',1e-5,'AbsTol',1e-5);
-t = 0:1:N_ott-1;
-[tempo,x] = ode45('gatto_vaccini_unico',t,x0, options);
+% t = 0:1:N_ott-1;
+[tempo,x] = ode45('gatto_vaccini_unico',t_ott,x0, options);
 
 L = Lvect(fix(tempo)+1);
 
-r=0.05;
-ts=1;
-xi=0;
-w=65000;
+% r=0.05;
+% ts=1;
+% xi=0;
+% w=65000;
 
 S = x(:,1); %suscettibili
 E = x(:,2); %esposti
@@ -55,7 +55,7 @@ arg1=S+E+P+I+A+S1+E1+P1+I1+A1+S2+E2+P2+I2+A2; %che va come costo di controllo,..
 arg3 = D+D1; %come l'argomento 2, solo che in questo caso aggiugiamo il costo xi 
 
 
-cost_function_value = sum( exp(-(r).*t').* ...
+cost_function_value = sum( exp(-(r).*t_ott').* ...
     (w.*L.*(ts.*(arg1) +1 -ts) +...
      + arg3.*(w/r + xi)) );
 
