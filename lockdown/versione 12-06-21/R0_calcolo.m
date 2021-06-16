@@ -56,6 +56,7 @@ A*sol
 global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
        alfaH gammaQ gammaA x0 N eff1 eff2 ef1 prima_d seconda_d Lvect NV
 
+
 parameters_vaccini;
 dati_vaccini;
 
@@ -68,17 +69,21 @@ step = 0.1;
 %cercando il tasso di raddoppio seleziono tradd in t quando ho
 %tra gli espostiv E quando raggiungo 2*E0
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:step:15, x0); 
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:step:10, x0);
+x_R0 = x_vaccini_tot(end, :);
+[t1,x_vaccini_tot1]= ode45('gatto_vaccini_unico', 0:step:20, x_R0);
 toc
 
 %VEDERE CHE CAZZO VUOLE E PERCHè DA I DATI NEGATIVI, QUESTA SEZIONE è
 %L'UNICA PROBLEMATICA PER QUESTO FATTO ED è L'UNICA CHE FA CASINO
 %ALL'INIZIO
 
-E = x_vaccini_tot(:,2);
-P = x_vaccini_tot(:,3);
-I = x_vaccini_tot(:,4);
-A = x_vaccini_tot(:,5);
+t = 0:step:30+step;
+
+E = [x_vaccini_tot(:,2); x_vaccini_tot1(:,2)];
+P = [x_vaccini_tot(:,3); x_vaccini_tot1(:,3)];
+I = [x_vaccini_tot(:,4);x_vaccini_tot1(:,4)];
+A = [x_vaccini_tot(:,5);x_vaccini_tot1(:,5)];
 
 figure(1)
 plot(t, log(E))
@@ -99,6 +104,7 @@ plot(t,[E P I A])
 tasso_expo = (log(P(end)) - log(P(end-1)))/step
 t_radd = log(2)/tasso_expo
 
+
 %% ritaratura R0, mettendo il tempo di raddoppio a CIRCA 3, A ''OCCHIO''
 
 parameters_vaccini_R0_raddoppio;
@@ -113,17 +119,21 @@ step = 0.1;
 %cercando il tasso di raddoppio seleziono tradd in t quando ho
 %tra gli espostiv E quando raggiungo 2*E0
 tic
-[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:step:18, x0); 
+[t,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:step:10, x0);
+x_R0 = x_vaccini_tot(end, :);
+[t1,x_vaccini_tot1]= ode45('gatto_vaccini_unico', 0:step:20, x_R0);
 toc
 
 %VEDERE CHE CAZZO VUOLE E PERCHè DA I DATI NEGATIVI, QUESTA SEZIONE è
 %L'UNICA PROBLEMATICA PER QUESTO FATTO ED è L'UNICA CHE FA CASINO
 %ALL'INIZIO
 
-E = x_vaccini_tot(:,2);
-P = x_vaccini_tot(:,3);
-I = x_vaccini_tot(:,4);
-A = x_vaccini_tot(:,5);
+t = 0:step:30+step;
+
+E = [x_vaccini_tot(:,2); x_vaccini_tot1(:,2)];
+P = [x_vaccini_tot(:,3); x_vaccini_tot1(:,3)];
+I = [x_vaccini_tot(:,4);x_vaccini_tot1(:,4)];
+A = [x_vaccini_tot(:,5);x_vaccini_tot1(:,5)];
 
 figure(1)
 plot(t, log(E))
@@ -139,10 +149,10 @@ plot(t,[E P I A])
 
 %calcolo il tasso esponenziale di crescita delle curve come coefficiente angolare delle curve logaritmiche a regime, 
 %che poi uso per il tempo di raddoppio--->problema: come collego Rt al
-%coefficiente angolare?
+%coefficiente angolare? NON SI PUò FARE ANALITICAMENTE
 
-tasso_expo1 = (log(P(end)) - log(P(end-1)))/step
-t_radd1 = log(2)/tasso_expo1
+tasso_expo = (log(P(end)) - log(P(end-1)))/step
+t_radd = log(2)/tasso_expo
 
 %OSS: NON SERVE CAMBIARE LE CONDIZIONI INIZIALI SE CI INTERESSA
 %L'EVOLUZIONE ESPONENZIALE DOPO UN PO' DI TEMPO (UNA SPECIE DI REGIME INIZIALE)
