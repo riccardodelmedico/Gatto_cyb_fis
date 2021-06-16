@@ -16,4 +16,4 @@ prima_dose_norm= prima_dose./pop;
 seconda_dose_norm= seconda_dose./pop;
 
 clear n vaccini vaccini_daily vaccini_matrix vaccini_matrix vaccini_matrix_timetable ...
-    vaccini_table prima_dose seconda_dose
+    vaccini_table prima_dose seconda_dose T

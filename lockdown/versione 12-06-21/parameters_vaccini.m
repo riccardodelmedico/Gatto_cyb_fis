@@ -11,7 +11,6 @@ gammaH= gammaI;
 gammaA= 2*gammaI;
 alfaI= 1 / 24.23;
 sig= 0.25; % (1-sigma) frazione degli asintomatici
-%betaP = R0/(1/deltaP + 1.03*sig/( eta + alfaI + gammaI)+ 0.033*(1-sig) / gammaA);
 betaA_betaP= 0.033; %betaA asymptomatic transmission rate
 betaI_betaA= 1.03;
 % betaP1/ betaP== 0.82; % betaP1 after restriction on february 22, 2020
@@ -24,9 +23,10 @@ alfaH = alfaI;
 eff1 = 0.9;
 eff2 = 1;
 ef1 = 0.7;
-teta = 1; %efficacia del lockdown
-% options = optimoptions('fmincon','Display','none','Algorithm','active-set',...
-%     'OptimalityTolerance', 1e-1, 'MaxFunctionEvaluations', 5,'FunValCheck','on');
+teta = 0.5; %efficacia del lockdown
+
+options_lockdown = optimoptions('fmincon','Display','iter-detailed','Algorithm','active-set','FunValCheck','on');
+options_ode = odeset('RelTol',1e-7,'AbsTol',1e-8);
 
 x1=1/deltaP;
 x2=sig/(eta+alfaI+gammaI);
@@ -38,8 +38,11 @@ A = linsolve(X,B);
 betaA = A(1);
 betaI = A(2);
 betaP = A(3);
-nolockdown= 25;
-novax= 270;
-Mvax = size(prima_dose_norm);
-NV = Mvax(1);
+nolockdown= 25; %periodo senza lockdown (supponiamo anche che il cambio di R0 avvenga dopo nolockdown giorni)
+novax= 270; % 9 mesi senza vaccinazioni
+NV = length(prima_dose_norm); % numero di giorni con vaccini
 N= nolockdown + novax + NV;
+
+clear x1 x2 x3 B X A betaA_betaP betaI_betaA
+
+
