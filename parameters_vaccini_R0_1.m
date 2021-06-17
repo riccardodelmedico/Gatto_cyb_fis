@@ -1,7 +1,7 @@
 global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
     alfaH gammaQ gammaA betaP betaI betaA eff1 eff2 ef1 teta
 
-R0=1.1;
+R0=1;
 deltaE= 1 / 3.32;
 deltaP= 1 / 0.75;
 eta= 1 / 4.05;
@@ -38,4 +38,7 @@ A = linsolve(X,B);
 betaA = A(1);
 betaI = A(2);
 betaP = A(3);
-NV = 136;
+nolockdown= 25;
+novax= 270;
+NV = size(prima_dose_norm);
+N= nolockdown + novax + NV(1);

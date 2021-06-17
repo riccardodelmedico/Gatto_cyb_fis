@@ -38,7 +38,7 @@ seconda_dos=seconda_d(fix(t)+1);
 L=Lvect(fix(t)+1);
 
 
-lambda= (betaP*(P+P1+P2) + betaI*(I+I1+I2) + betaA*(A+A1+A2))/(S + E + (I+I1+I2) + (A+A1+A2) + R);
+lambda= (betaP*(P+P1+P2) + betaI*(I+I1+I2) + betaA*(A+A1+A2))/(S+S1+S2 + E+E1+E2 + (I+I1+I2) + (A+A1+A2) + R+R1+R2);
 xdot = zeros(24,1);
 
     xdot(1) = - lambda*S*(1-teta*L)^2-eff1*prima_dos;
@@ -66,9 +66,9 @@ xdot = zeros(24,1);
     xdot(19) = - lambda*S2*(1-teta*L)^2+eff2*seconda_dos;
     xdot(20) = lambda*S2*(1-teta*L)^2 - deltaE*E2;
     xdot(21) = deltaE*E2 - deltaP*P2;
-    xdot(22) = sig*deltaP*P2 - gammaA*I2;
+    xdot(22) = sig*deltaP*P2 - gammaI*I2;
     xdot(23) = (1 - sig)*deltaP*P2 - gammaA*A2;
-    xdot(24) = gammaA*I2 + gammaA*A2;
+    xdot(24) = gammaI*I2 + gammaA*A2;
 
 
 end
