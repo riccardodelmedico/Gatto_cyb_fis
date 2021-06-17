@@ -60,61 +60,55 @@ tic
 [x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0,1,nolockdown-1, x0'); 
 toc
 %
+soluzione1= zeros(nolockdown, 24);
+for j=1:1:nolockdown
+    for i= 1:1:24
+        soluzione1(j,i)=x_vaccini_tot(24*(j-1)+i);
+    end
+end
+
+
+figure(1)
+plot(soluzione1(:,1))%plot totale
+legend('S(t)','E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
+xlabel('Days')
+
+figure(2)
+plot( soluzione1(:,2:end))%plot totale
+legend('E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
+xlabel('Days')
+%%
+%
 parameters_vaccini_R0_1; %ricalcolo dei beta_i con R0=1.1
 % carichiamo i nuovi parametri dei vaccini (si potrebbe fare anche con il lockdown, ma così scaliamo direttamente R0 e i beta)
 
 x01 = x_vaccini_tot(end-23:end); %aggiorniamo le condizioni iniziali del nuovo sistema
-% h = 1;
-% tf = novax+NV-1;
-% %risolviamo il Gatto senza vaccini per 9 mesi (novax giorni), poi intervengono i vaccini
-% tic
-% [x_vaccini_tot1]= ode4(@gatto_vaccini_unico, 0,h,tf, x01); 
-% toc
-% t = (0:h:tf)';
-% x_vaccini=[x_vaccini_tot(:,:); x_vaccini_tot1(:,:)]; %uniamo i risultati delle due soluzioni
-% figure(1)
-% plot(t, [x_vaccini(:,[1 10 19])]) %visione suscettibili
-% legend('S(t)','S1(t)','S2(t)')
-% xlabel('Days')
-% %
-% figure(2)
-% plot(x_vaccini(:,2:9)) %primo set di equazioni
-% legend('E(t)', 'P(t)', 'I(t)', 'A(t)', 'H(t)', 'Q(t)', 'R(t)', 'D(t)')
-% xlabel('Days')
-% %
-% figure(3) %altre variabili: secondo set di equazioni
-% plot(x_vaccini(:,11:18))
-% legend('E1(t)', 'P1(t)', 'I1(t)', 'A1(t)', 'H1(t)', 'Q1(t)', 'R1(t)', 'D1(t)')
-% xlabel('Days')
-% % 
-% figure(4) %altre variabili 3 gatto
-% plot(x_vaccini(:,19:24))
-% legend('S2(t)','E2(t)', 'P2(t)', 'I2(t)', 'A2(t)','R2(t)')
-% xlabel('Days')
+
 
 tic
-[x_vaccini_tot1]= ode4(@gatto_vaccini_unico, 0, 1, novax-1, x01); 
+[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0,1,novax-1, x01); 
 toc
-% lambda in questo file accoppia le sottodinamiche dei 3 set di equazioni dei vaccini
-soluzione= zeros(novax+nolockdown, 24);
-for j=1:1:nolockdown
-    for i= 1:1:24
-        soluzione(j,i)=x_vaccini_tot(24*(j-1)+i);
-    end
-end
+%
+soluzione2= zeros(novax, 24);
 for j=1:1:novax
     for i= 1:1:24
-        soluzione(j,i)=x_vaccini_tot1(24*(j-1)+i);
+        soluzione2(j,i)=x_vaccini_tot(24*(j-1)+i);
     end
 end
 
-plot( soluzione(:,1))%plot totale
+figure(3)
+plot( soluzione2(:,1))%plot totale
 legend('S(t)','E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
 xlabel('Days')
 
-%REIMPOSTARE LA CONDIZIONE INIZIALE PER IL PROBLEMA DI OTTIMO
+figure(4)
+plot( soluzione2(:,2:end))%plot totale
+legend('E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
+xlabel('Days')
 
+%% reimposto la condizione per il problema di ottimo
 
+x0 = soluzione(end,:);
 
 
 
@@ -304,11 +298,11 @@ options_lockdown= optimoptions('fmincon','Display','iter-detailed','Algorithm','
 % U0 = [zeros(nolockdown,1); 0.7.*ones(N-nolockdown,1).*(1-time1'./(N-nolockdown))];
 %come sopra non avrebbe molto senso parlare di condizione con 0 lockdown
 %per cui diamo come condizione iniziale un valore per cui Rt circa = 1
-valori0 = 0.1;
+valori0 = 0.9;
 
 %costruisco un vettore di costanti tale da avere lockdownccostanti su 14 giorni
 for i = 1:14:N_ott
-   valori0 = [valori0 , 0.1]; 
+   valori0 = [valori0 , 0.9]; 
 end
 
 % %prova eventuale scalatura di valori0
@@ -353,9 +347,9 @@ for j=1:1:165
         soluzione(j,i)=x_vaccini_tot(24*(j-1)+i);
     end
 end
-
-
-plot( soluzione(:,:))%plot totale
+%%
+figure(2)
+plot( soluzione(:,1))%plot totale
 legend('S(t)','E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
 xlabel('Days')
 
