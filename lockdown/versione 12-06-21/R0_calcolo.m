@@ -56,10 +56,9 @@ A*sol
 global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
        alfaH gammaQ gammaA x0 N eff1 eff2 ef1 prima_d seconda_d Lvect NV
 
-
+format longg
 parameters_vaccini;
 dati_vaccini;
-
 
 Lvect = zeros(1,N);
 x0= [1-1*E0 1*E0 zeros(1,22)];
@@ -73,7 +72,9 @@ tic
 x_R0 = x_vaccini_tot(end, :);
 [t1,x_vaccini_tot1]= ode45('gatto_vaccini_unico', 0:step:20, x_R0);
 toc
-
+% tic
+% [yout]= ode4('gatto_vaccini_unico', 0, 0.1, 30, x0)
+% toc
 %VEDERE CHE CAZZO VUOLE E PERCHè DA I DATI NEGATIVI, QUESTA SEZIONE è
 %L'UNICA PROBLEMATICA PER QUESTO FATTO ED è L'UNICA CHE FA CASINO
 %ALL'INIZIO
@@ -93,9 +94,14 @@ plot(t,log(I))
 plot(t,log(A))
 hold off
 legend('E', 'P','I', 'A')
+xlabel('Days')
+ylabel('Logarithmic scale')
 
 figure(2)
 plot(t,[E P I A])
+legend('E', 'P','I', 'A')
+xlabel('Days')
+
 
 %calcolo il tasso esponenziale di crescita delle curve come coefficiente angolare delle curve logaritmiche a regime, 
 %che poi uso per il tempo di raddoppio--->problema: come collego Rt al

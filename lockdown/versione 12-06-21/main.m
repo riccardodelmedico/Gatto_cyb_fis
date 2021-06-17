@@ -34,7 +34,7 @@ Lvect= zeros(N,1); % prima soluzione in evoluzione libera
 x0= [1-1*E0 1*E0 zeros(1,22)];
 
 tic
-[t0,x_vaccini_tot]= ode45('gatto_vaccini_unico', 0:1:nolockdown+novax-1, x0,options_ode); 
+[t0,x_vaccini_tot]= ode4('gatto_vaccini_unico', 0:1:nolockdown+novax-1, x0,options_ode); 
 toc
 % lambda in questo file accoppia le sottodinamiche dei 3 set di equazioni dei vaccini
 figure(1)
@@ -81,7 +81,7 @@ legend('E1(t)', 'P1(t)', 'I1(t)', 'A1(t)', 'H1(t)', 'Q1(t)', 'R1(t)', 'D1(t)')
 xlabel('Days')
 % 
 figure(4) %altre variabili 3 gatto
-plot(x_vaccini(:,20:24))
+plot(x_vaccini(:,19:24))
 legend('S2(t)','E2(t)', 'P2(t)', 'I2(t)', 'A2(t)','R2(t)')
 xlabel('Days')
 
@@ -95,7 +95,7 @@ parameters_vaccini;
 x0= [1-1*E0 1*E0 zeros(1,22)];
 
 tic
-[~,x_vaccini_lockdown]= ode45('gatto_vaccini_unico',0:1:N-1,x0,options_ode);
+[~,x_vaccini_lockdown]= ode45('gatto_vaccini_unico', 0:1:N-1,x0 , options_ode);
 toc
 
 figure(1)
@@ -114,7 +114,7 @@ legend('E1(t)', 'P1(t)', 'I1(t)', 'A1(t)', 'H1(t)', 'Q1(t)', 'R1(t)', 'D1(t)')
 xlabel('Days')
 % 
 figure(4) %altre variabili 3 gatto
-plot(x_vaccini_lockdown(:,20:24))
+plot(x_vaccini_lockdown(:,19:24))
 legend('S2(t)','E2(t)', 'P2(t)', 'I2(t)', 'A2(t)','R2(t)')
 xlabel('Days')
 
@@ -130,7 +130,7 @@ x0_casc = [1-1*E0 , 1*E0, zeros(1,29)]; %aumentano le CI aumentanto i compartime
 
 options = odeset('RelTol',1e-8,'AbsTol',1e-10);
 tic
-[t,x_vaccini_waterfall]= ode45('gatto_vaccini_unico_cascate', 0:1:novax+nolockdown-1, x0_casc,options); 
+[t,x_vaccini_waterfall]= ode4('gatto_vaccini_unico_cascate', 0:1:novax+nolockdown-1, x0_casc,options); 
 toc
 
 figure(1)
