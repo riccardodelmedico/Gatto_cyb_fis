@@ -1,5 +1,4 @@
-
-function xdot= gatto_vaccini_unico(t,x)
+function xdot= gatto_vaccini_unico_cascate(t,x)
 
 global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH alfaH ...
     gammaQ betaP betaA betaI N x0 eff1 eff2 ef1 prima_d seconda_d ...

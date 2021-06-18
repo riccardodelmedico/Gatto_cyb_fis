@@ -74,16 +74,15 @@ legend('S(t)','E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
 xlabel('Days')
 
 figure(2)
-plot( soluzione1(:,2:end))%plot totale
+plot( soluzione1(:,2:9))%plot totale
 legend('E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
 xlabel('Days')
-%%
-%
-parameters_vaccini_R0_1; %ricalcolo dei beta_i con R0=1.1
+
+R0= 1.1; % si può settare l'R0 desiderato, r0_raddoppio aggiorna i beta_i
+r0_raddoppio; %ricalcolo dei beta_i con R0=1.1
 % carichiamo i nuovi parametri dei vaccini (si potrebbe fare anche con il lockdown, ma così scaliamo direttamente R0 e i beta)
 
 x01 = x_vaccini_tot(end-23:end); %aggiorniamo le condizioni iniziali del nuovo sistema
-
 
 tic
 [x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0,1,novax-1, x01); 
@@ -97,20 +96,20 @@ for j=1:1:novax
 end
 
 figure(3)
-plot( soluzione2(:,1))%plot totale
-legend('S(t)','E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
+plot( soluzione2(:,1))%plot suscettibili
+legend('S(t)')
 xlabel('Days')
 
 figure(4)
-plot( soluzione2(:,2:end))%plot totale
+plot( soluzione2(:,2:9))%plot totale
 legend('E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
 xlabel('Days')
 
-%% reimposto la condizione per il problema di ottimo
-
-x0 = soluzione(end,:);
-
-
+figure(5)
+soluzione= [soluzione1(:,:); soluzione2(:,:)];
+plot(soluzione(:,:))
+legend('S(t)','E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
+xlabel('Days')
 
 %% Introduzione del lockdown
 %lockdown introdotto dopo nolockdown giorni
@@ -122,18 +121,17 @@ parameters_vaccini;
 x0= [1-1*E0 1*E0 zeros(1,22)];
 
 tic
-[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0, 1, nolockdown+novax-1, x0'); 
+[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0, 1, N-1, x0'); 
 toc
 % lambda in questo file accoppia le sottodinamiche dei 3 set di equazioni dei vaccini
-soluzione= zeros(novax+nolockdown, 24);
-for j=1:1:295
+soluzione= zeros(N, 24);
+for j=1:1:N
     for i= 1:1:24
         soluzione(j,i)=x_vaccini_tot(24*(j-1)+i);
     end
 end
 
-
-plot( soluzione(:,:))%plot totale
+plot(soluzione(:,:))%plot totale
 legend('S(t)','E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
 xlabel('Days')
 
@@ -141,29 +139,15 @@ figure(2)
 plot(soluzione(:,2:9)) %primo set di equazioni
 legend('E(t)', 'P(t)', 'I(t)', 'A(t)', 'H(t)', 'Q(t)', 'R(t)', 'D(t)')
 xlabel('Days')
-%
-%INUTILI QUESTE SE NON PARTE LA VACCINAZIONE
-% figure(3) %altre variabili: secondo set di equazioni
-% plot(soluzione(:,11:18))
-% legend('E1(t)', 'P1(t)', 'I1(t)', 'A1(t)', 'H1(t)', 'Q1(t)', 'R1(t)', 'D1(t)')
-% xlabel('Days')
-% 
-% figure(4) %altre variabili 3 gatto
-% plot(soluzione(:,19:24))
-% legend('S2(t)','E2(t)', 'P2(t)', 'I2(t)', 'A2(t)','R2(t)')
-% xlabel('Days')
-
 %% ODE waterfall
 %ora introduciamo le cascate di Ode ma secondo il Gatto (su E e su H come a pagina 11)
 global x0_casc
 
 parameters_vaccini;
-dati_vaccini;
 
-Lvect= [zeros(N,1)]; %lockdown nullo
+Lvect= [zeros(nolockdown,1); 0*ones(novax,1)]; %da qua possiamo gestire il lockdown sui vari intervalli
 x0_casc = [1-1*E0 , 1*E0, zeros(1,29)]; %aumentano le CI aumentanto i compartimenti
 
-% options = odeset('RelTol',1e-8,'AbsTol',1e-10);
 tic
 [x_vaccini_tot]= ode4(@gatto_vaccini_unico_cascate, 0, 1, nolockdown+novax-1, x0_casc'); 
 toc
@@ -175,7 +159,7 @@ for j=1:1:295
     end
 end
 
-
+figure(1)
 plot( soluzione(:,:))%plot totale
 legend('S(t)','E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
 xlabel('Days')
@@ -196,9 +180,8 @@ xlabel('Days')
 
 global x0_casc_inf
 
-Lvect= [zeros(nolockdown,1); 0*ones(novax,1); 0*ones(NV,1)]; %da qua possiamo gestire il lockdown sui vari intervalli
+Lvect= [zeros(nolockdown,1); 0*ones(novax,1)]; %da qua possiamo gestire il lockdown sui vari intervalli
 x0_casc_inf = [1-1*E0 , 1*E0, zeros(1,40)];
-
 
 tic
 [x_vaccini_tot]= ode4(@gatto_vaccini_unico_cascatesoloInfetti, 0, 1, nolockdown+novax, x0_casc_inf'); 
@@ -211,7 +194,7 @@ for j=1:1:295
     end
 end
 
-
+figure(1)
 plot( soluzione(:,:))%plot totale
 legend('S(t)','E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
 xlabel('Days')
@@ -223,39 +206,32 @@ legend('S(t)','S1(t)','S2(t)')
 figure(3)
 plot(soluzione(:,[2,3, 6:8])) %altre variabili 1 gatto
 legend('E(t)','P(t)','I3(t)', 'A(t)', 'H(t)', 'Q(t)', 'R(t)', 'D(t)')
-% 
-% figure(4) %altre variabili 2 gatto
-% plot(t, x_vaccini_tot(:,13:22))
-% legend('E1(t)','P1(t)', 'I13(t)', 'A1(t)', 'H1(t)', 'Q1(t)', 'R1(t)', 'D1(t)')
-
 
 %% %% Prova del funzionale di costo
 
-global N_ott;
-N_ott = N-nolockdown-novax; %che è 165
+global N_ott r ts xi w t_ott f R0
+N_ott = N-nolockdown-novax; %lavoro su 165, con lockdown ottimale e vaccini
 prima_d = prima_dose_norm;
 seconda_d = seconda_dose_norm;
 
-global r ts xi w t_ott
 r=0.05;
-ts=1;
-xi=0;
+xi=0; % termine aggiuntivo come extra costo delle vite
 w=65000;
 t_ott = 0:1:N_ott-1;
-
+f= 0.99999; % parametro per gestire lo sbilanciamento del funzionale (costo delle vite vs perdite economiche)
 %siccome stiamo parlando del rilascio di lockdown, non ci interessa partire
 %con valore di L a 0
-
-Lvect = zeros(1,N_ott);
-U0 = [0.7*ones(N_ott,1)];
+x0= [1-1*E0 1*E0 zeros(1,22)]; % condizioni iniziali per risolvere le ode
+Lvect = zeros(N_ott,1);
+U0 = [0.5*ones(N_ott,1)]; %condizioni iniziali di vettore di ingresso di lockdown per l'ottimizzatore
 
 lb= zeros(N_ott,1); % lower bounds
-ub= 0.9.*ones(N_ott,1); % upper bounds
+ub= 0.9*ones(N_ott,1); % upper bounds
 
 %ed attenzione che devo aggiornare il modello affinchè l'epidemia viaggi
-%con tempo di raddoppio circa 3, settando qui R0 a 2.3
-%
-parameters_vaccini_R0_raddoppio;
+%con tempo di raddoppio circa 3, settando qui R0=2.3
+R0= 2.3;
+r0_raddoppio; 
 
 tic
 [Uvec,fval,exitflag] = fmincon('cost_function',U0,[],[],[],[],lb,ub,[],options_lockdown);
@@ -263,13 +239,26 @@ toc
 t = 0:N_ott-1;
 % evolution 
 Lvect = Uvec;
-[time, XFin] = ode45('gatto_vaccini_unico',t,x0);
-%
+tic
+[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0, 1, 164, x0'); 
+toc
+% lambda in questo file accoppia le sottodinamiche dei 3 set di equazioni dei vaccini
+soluzione= zeros(novax+nolockdown, 24);
+for j=1:1:165
+    for i= 1:1:24
+        soluzione(j,i)=x_vaccini_tot(24*(j-1)+i);
+    end
+end
+
 figure(1)
-plot(time, Uvec)
+plot(Uvec)
+legend('Optimizated lockdown')
+xlabel('Days')
 
 figure(2)
-plot(time, XFin(:,:))
+plot(soluzione(:,:))
+ylabel('22 variables')
+xlabel('Days')
 
 %% ora proviamo ad impostare l'ottimizzazione parametrica: tipo lockdown costante su tutta la finestra temporale
 %come prima aggiustando R0 per avere il tasso di raddoppio richiesto
@@ -277,14 +266,13 @@ plot(time, XFin(:,:))
 %anche qui scalare nellos script R0 ai valori corrispondenti al tasso di
 %raddoppio voluto
 
-parameters_vaccini_R0_raddoppio;
+r0_raddoppio;
 
-global N_ott;
+global N_ott  r ts xi w t_ott
 N_ott = N-nolockdown-novax; %che è 165
 prima_d = prima_dose_norm;
 seconda_d = seconda_dose_norm;
 
-global r ts xi w t_ott
 r=0.05;
 ts=1;
 xi=0;

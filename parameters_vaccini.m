@@ -32,7 +32,7 @@ x1=1/deltaP;
 x2=sig/(eta+alfaI+gammaI);
 x3=(1-sig)/gammaA;
 
-B = [0 0 3.6].'; %termini noti
+B = [0; 0; 3.6]; %termini noti
 X = [1 0 -betaA_betaP; -betaI_betaA 1 0; x3 x2 x1];
 A = linsolve(X,B);
 betaA = A(1);

@@ -13,8 +13,7 @@ H = x(6); %ospedalizzati
 Q = x(7); %quarantena casalinga
 R = x(8); %recuperati
 D = x(9); %dead
-% parameters_vaccini;
-% dati_vaccini;
+
 S1 = x(10); %suscettibili
 E1 = x(11); %esposti
 P1 = x(12); %presintomatici
@@ -24,8 +23,7 @@ H1 = x(15); %ospedalizzati
 Q1 = x(16); %quarantena casalinga
 R1 = x(17); %recuperati
 D1 = x(18); %dead
-% parameters_vaccini;
-% dati_vaccini;
+
 S2 = x(19); %suscettibili
 E2 = x(20); %esposti gruppo
 P2 = x(21); %presintomatici
