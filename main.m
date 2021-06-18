@@ -233,17 +233,18 @@ f= 0.5; % parametro per gestire lo sbilanciamento del funzionale (costo delle vi
 %con valore di L a 0
 x0= x0_opt; % condizioni iniziali per risolvere le ode
 Lvect = zeros(N_ott,1);
-U0 = [0.5*ones(N_ott,1)]; %condizioni iniziali di vettore di ingresso di lockdown per l'ottimizzatore
+U0 = [0.95*ones(N_ott,1)]; %condizioni iniziali di vettore di ingresso di lockdown per l'ottimizzatore
 
-lb= zeros(N_ott,1); % lower bounds
-ub= 0.8*ones(N_ott,1); % upper bounds
+lb= 0*ones(N_ott,1); % lower bounds
+ub= ones(N_ott,1); % upper bounds
 
-%aggiorniamo il modello affinchè l'epidemia viaggicon tempo di raddoppio circa 3, settando qui R0=2.3
+%aggiorniamo il modello affinchè l'epidemia viaggicon tempo di raddoppio
+%circa 3, settando qui R0=2.65
 R0= 2.65;
 r0_raddoppio; 
-
+f = 0.995;
 tic
-[Uvec,fval,exitflag] = fmincon('cost_function',U0,[],[],[],[],lb,ub,[],options_lockdown);
+[Uvec,fval,exitflag] = fmincon('cost_function',U0,[],[],[],[],lb,ub,@nonlincon, options_lockdown);
 toc
 t = 0:N_ott-1;
 % evolution 
