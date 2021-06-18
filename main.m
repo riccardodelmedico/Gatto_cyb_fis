@@ -31,9 +31,9 @@ ylabel('Vaccines per days')
 % fonte: https://github.com/pcm-dpc/COVID-19/blob/master/dati-andamento-nazionale/dpc-covid19-ita-andamento-nazionale-20201227.csv
 
 Lvect= zeros(N,1); % prima soluzione in evoluzione libera
-x0= [1-1*E0 1*E0 zeros(1,22)];
+x0= [1-1*E0; 1*E0; zeros(22,1)];
 tic
-[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0, 1, nolockdown+novax-1, x0'); 
+[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0, 1, nolockdown+novax-1, x0); 
 toc
 % lambda in questo file accoppia le sottodinamiche dei 3 set di equazioni dei vaccini
 soluzione= zeros(novax+nolockdown, 24);
@@ -44,7 +44,7 @@ for j=1:1:295
 end
 
 figure(1)
-plot( soluzione(:,:))%plot totale
+plot(soluzione(:,:))%plot totale
 legend('S(t)','E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
 xlabel('Days')
 %lavorando su nolockdown+novax giorni non subentrano i vaccini
@@ -55,9 +55,9 @@ xlabel('Days')
 % fonte: https://github.com/pcm-dpc/COVID-19/blob/master/dati-andamento-nazionale/dpc-covid19-ita-andamento-nazionale-20201227.csv
 % fase iniziale (nolockdown giorni) con R0=3.6
 Lvect = zeros(N,1);
-x0= [1-1*E0 1*E0 zeros(1,22)];
+x0= [1-1*E0; 1*E0; zeros(22,1)];
 tic
-[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0,1,nolockdown-1, x0'); 
+[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0,1,nolockdown-1, x0); 
 toc
 %
 soluzione1= zeros(nolockdown, 24);
@@ -82,10 +82,10 @@ R0= 1; % si può settare l'R0 desiderato, r0_raddoppio aggiorna i beta_i
 r0_raddoppio; %ricalcolo dei beta_i con R0=1.1
 % carichiamo i nuovi parametri dei vaccini (si potrebbe fare anche con il lockdown, ma così scaliamo direttamente R0 e i beta)
 
-x01 = x_vaccini_tot(end-23:end); %aggiorniamo le condizioni iniziali del nuovo sistema
+x01 = soluzione1(nolockdown,:); %aggiorniamo le condizioni iniziali del nuovo sistema
 
 tic
-[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0,1,novax-1, x01); 
+[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0,1,novax-1, x01'); 
 toc
 %
 soluzione2= zeros(novax, 24);
@@ -120,10 +120,10 @@ x0_opt=soluzione(novax+nolockdown,:);
 %che settiamo un coefficiente (1-teta*L)^2 di fronte a lambda.
 Lvect = [zeros(nolockdown,1);0.9*ones(N-nolockdown,1)];
 parameters_vaccini;
-x0= [1-1*E0 1*E0 zeros(1,22)];
+x0= [1-1*E0; 1*E0; zeros(22,1)];
 
 tic
-[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0, 1, N-1, x0'); 
+[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0, 1, N-1, x0); 
 toc
 % lambda in questo file accoppia le sottodinamiche dei 3 set di equazioni dei vaccini
 soluzione= zeros(N, 24);
@@ -148,10 +148,10 @@ global x0_casc
 parameters_vaccini;
 
 Lvect= [zeros(nolockdown,1); 0*ones(novax,1)]; %da qua possiamo gestire il lockdown sui vari intervalli
-x0_casc = [1-1*E0 , 1*E0, zeros(1,29)]; %aumentano le CI aumentanto i compartimenti
+x0_casc = [1-1*E0; 1*E0; zeros(29,1)]; %aumentano le CI aumentanto i compartimenti
 
 tic
-[x_vaccini_tot]= ode4(@gatto_vaccini_unico_cascate, 0, 1, nolockdown+novax-1, x0_casc'); 
+[x_vaccini_tot]= ode4(@gatto_vaccini_unico_cascate, 0, 1, nolockdown+novax-1, x0_casc); 
 toc
 % lambda in questo file accoppia le sottodinamiche dei 3 set di equazioni dei vaccini
 soluzione= zeros(novax+nolockdown, 31);
@@ -183,10 +183,10 @@ xlabel('Days')
 global x0_casc_inf
 
 Lvect= [zeros(nolockdown,1); 0*ones(novax,1)]; %da qua possiamo gestire il lockdown sui vari intervalli
-x0_casc_inf = [1-1*E0 , 1*E0, zeros(1,40)];
+x0_casc_inf = [1-1*E0; 1*E0; zeros(40,1)];
 
 tic
-[x_vaccini_tot]= ode4(@gatto_vaccini_unico_cascatesoloInfetti, 0, 1, nolockdown+novax-1, x0_casc_inf'); 
+[x_vaccini_tot]= ode4(@gatto_vaccini_unico_cascatesoloInfetti, 0, 1, nolockdown+novax-1, x0_casc_inf); 
 toc
 % lambda in questo file accoppia le sottodinamiche dei 3 set di equazioni dei vaccini
 soluzione= zeros(novax+nolockdown, 42);
@@ -225,10 +225,10 @@ f= 0.5; % parametro per gestire lo sbilanciamento del funzionale (costo delle vi
 %con valore di L a 0
 x0= x0_opt; % condizioni iniziali per risolvere le ode
 Lvect = zeros(N_ott,1);
-U0 = [0*ones(N_ott,1)]; %condizioni iniziali di vettore di ingresso di lockdown per l'ottimizzatore
+U0 = [0.5*ones(N_ott,1)]; %condizioni iniziali di vettore di ingresso di lockdown per l'ottimizzatore
 
 lb= zeros(N_ott,1); % lower bounds
-ub= 0.9*ones(N_ott,1); % upper bounds
+ub= 0.8*ones(N_ott,1); % upper bounds
 
 %aggiorniamo il modello affinchè l'epidemia viaggicon tempo di raddoppio circa 3, settando qui R0=2.3
 R0= 2.3;
@@ -269,7 +269,7 @@ plot(soluzione(:, [2 3 4 5 6 7 8 9]))
 
 %anche qui scalare nellos script R0 ai valori corrispondenti al tasso di
 %raddoppio voluto
-
+R0=2,3;
 r0_raddoppio;
 
 global N_ott  r ts xi w t_ott
@@ -278,15 +278,10 @@ prima_d = prima_dose_norm;
 seconda_d = seconda_dose_norm;
 
 r=0.05;
-ts=1;
 xi=0;
 w=65000;
 t_ott = 0:1:N_ott-1;
 
-%time1=0:1:N-nolockdown-1;
-% U0 = [zeros(nolockdown,1); 0.7.*ones(N-nolockdown,1).*(1-time1'./(N-nolockdown))];
-%come sopra non avrebbe molto senso parlare di condizione con 0 lockdown
-%per cui diamo come condizione iniziale un valore per cui Rt circa = 1
 valori0 = 0.9;
 
 %costruisco un vettore di costanti tale da avere lockdownccostanti su 14 giorni
