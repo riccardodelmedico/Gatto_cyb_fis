@@ -3,8 +3,8 @@ clear
 clear all
 %%
 global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
-       alfaH gammaQ gammaA x0 N eff1 eff2 ef1 prima_d seconda_d Lvect NV
-   
+       alfaH gammaQ gammaA x0 N eff1 eff2 ef1 prima_d seconda_d Lvect NV R0
+R0 = 3.6;
 format longg %utilizzando valori molto piccoli le 4 cifre decimali non sono sufficienti
 dati_vaccini;
 parameters_vaccini;
@@ -118,21 +118,24 @@ x0_opt=soluzione(novax+nolockdown,:);
 %questo caso equivale alla scalatura di R0 ma viene effettuata attraverso
 %il lockdown: i beta_i non cambiano direttamente ma sono limitati dal fatto
 %che settiamo un coefficiente (1-teta*L)^2 di fronte a lambda.
-Lvect = [zeros(nolockdown,1);0.9*ones(N-nolockdown,1)];
+%e quindi riassegnamo a R0 il valore originale
+R0 = 3.6;
+Lvect = [zeros(nolockdown,1);0.95*ones(N-nolockdown,1)];
 parameters_vaccini;
 x0= [1-1*E0; 1*E0; zeros(22,1)];
 
 tic
-[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0, 1, N-1, x0); 
+[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0, 1, novax+nolockdown-1, x0); 
 toc
 % lambda in questo file accoppia le sottodinamiche dei 3 set di equazioni dei vaccini
-soluzione= zeros(N, 24);
-for j=1:1:N
+soluzione= zeros(novax+nolockdown, 24);
+for j=1:1:novax+nolockdown
     for i= 1:1:24
         soluzione(j,i)=x_vaccini_tot(24*(j-1)+i);
     end
 end
 
+figure(1)
 plot(soluzione(:,:))%plot totale
 legend('S(t)','E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
 xlabel('Days')
@@ -140,6 +143,11 @@ xlabel('Days')
 figure(2)
 plot(soluzione(:,2:9)) %primo set di equazioni
 legend('E(t)', 'P(t)', 'I(t)', 'A(t)', 'H(t)', 'Q(t)', 'R(t)', 'D(t)')
+xlabel('Days')
+
+figure(3)
+plot(soluzione(:,1))
+legend('S(t)')
 xlabel('Days')
 %% ODE waterfall
 %ora introduciamo le cascate di Ode ma secondo il Gatto (su E e su H come a pagina 11)
@@ -231,7 +239,7 @@ lb= zeros(N_ott,1); % lower bounds
 ub= 0.8*ones(N_ott,1); % upper bounds
 
 %aggiorniamo il modello affinchè l'epidemia viaggicon tempo di raddoppio circa 3, settando qui R0=2.3
-R0= 2.3;
+R0= 2.65;
 r0_raddoppio; 
 
 tic
@@ -269,7 +277,7 @@ plot(soluzione(:, [2 3 4 5 6 7 8 9]))
 
 %anche qui scalare nellos script R0 ai valori corrispondenti al tasso di
 %raddoppio voluto
-R0=2,3;
+R0=2,65;
 r0_raddoppio;
 
 global N_ott  r ts xi w t_ott

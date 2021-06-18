@@ -1,7 +1,7 @@
 global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
-    alfaH gammaQ gammaA betaP betaI betaA eff1 eff2 ef1 teta
+    alfaH gammaQ gammaA betaP betaI betaA eff1 eff2 ef1 teta R0
 
-R0=3.6;
+%R0=3.6;
 deltaE= 1 / 3.32;
 deltaP= 1 / 0.75;
 eta= 1 / 4.05;

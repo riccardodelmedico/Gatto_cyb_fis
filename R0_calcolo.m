@@ -51,7 +51,7 @@ t_radd = log(2)/tasso_expo
 
 
 %% ritaratura R0, mettendo il tempo di raddoppio a CIRCA 3, A ''OCCHIO''
-R0 = 2.3;
+R0 = 2.65;
 r0_raddoppio;
 
 Lvect = zeros(N,1);
@@ -150,7 +150,7 @@ tasso_expo = log(P(end)) - log(P(end-1))
 t_radd = log(2)/tasso_expo
 
 %% cerchiamo di tarare allora (waterfall ODE E,H)
-R0=2.3;
+R0=2.65;
 r0_raddoppio;
 
 Lvect = zeros(N,1);
@@ -203,7 +203,7 @@ R0=3.6;
 r0_raddoppio;
 
 Lvect = zeros(N,1);
-x0_casc_inf = [1-1*E0; 1*E0; zeros(1,40)];
+x0_casc_inf = [1-1*E0; 1*E0; zeros(40,1)];
 
 tic
 [x_vaccini_tot]= ode4(@gatto_vaccini_unico_cascatesoloInfetti, 0, 1, 30, x0_casc_inf); 
@@ -246,7 +246,7 @@ tasso_expo = log(P(end)) - log(P(end-1))
 t_radd = log(2)/tasso_expo
 
 %% ritariamo anche questo
-R0 = 2.3;
+R0 = 2.65;
 r0_raddoppio;
 
 Lvect = zeros(N,1);
