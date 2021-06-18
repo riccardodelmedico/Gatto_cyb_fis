@@ -25,7 +25,7 @@ eff2 = 1;
 ef1 = 0.7;
 teta = 0.5; %efficacia del lockdown
 
-options_lockdown = optimoptions('fmincon','Display','iter-detailed','Algorithm','active-set','FunValCheck','on');
+options_lockdown = optimoptions('fmincon','Display','iter-detailed','Algorithm','active-set','FunValCheck','on','ConstraintTolerance',1.0e-6,'MaxIterations', 20);
 options_ode = odeset('RelTol',1e-7,'AbsTol',1e-8);
 
 x1=1/deltaP;

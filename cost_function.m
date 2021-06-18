@@ -6,12 +6,10 @@ global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH alfaH ...
 
 %ora l'orizzonte temporale di soluzione è solo quello sui vaccini
 Lvect = Utry;
-tic
-[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0,1,165-1, [0.99;0.01;zeros(22,1)]); 
-toc
+[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0,1,N_ott-1, x0); 
 
-x= zeros(165, 24);
-for j=1:1:165
+x= zeros(N_ott, 24);
+for j=1:1:N_ott
     for i= 1:1:24
         x(j,i)=x_vaccini_tot(24*(j-1)+i);
     end
@@ -23,5 +21,5 @@ arg1 = x(:,1)+ x(:,2) + x(:,3) + x(:,4) + x(:,5) + x(:,10)+x(:,11)+x(:,12)...
 arg3 = x(:,9) + x(:,18); %costo in vite umani, sono i morti, maggiorati di un termine xi
 
 cost_function_value = sum( exp(-(r).*t_ott').* ...
-    (1-f).*(w.*Lvect.*(arg1 +1) +...
-    + f.*arg3.*(w/r + xi) ) );
+    (1-f).*(w.*Lvect.*(arg1)) +...
+    + f.*arg3.*(w/r + xi) );

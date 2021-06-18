@@ -43,7 +43,7 @@ for j=1:1:295
     end
 end
 
-
+figure(1)
 plot( soluzione(:,:))%plot totale
 legend('S(t)','E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
 xlabel('Days')
@@ -78,7 +78,7 @@ plot( soluzione1(:,2:9))%plot totale
 legend('E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
 xlabel('Days')
 
-R0= 1.1; % si può settare l'R0 desiderato, r0_raddoppio aggiorna i beta_i
+R0= 1; % si può settare l'R0 desiderato, r0_raddoppio aggiorna i beta_i
 r0_raddoppio; %ricalcolo dei beta_i con R0=1.1
 % carichiamo i nuovi parametri dei vaccini (si potrebbe fare anche con il lockdown, ma così scaliamo direttamente R0 e i beta)
 
@@ -111,6 +111,8 @@ plot(soluzione(:,:))
 legend('S(t)','E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
 xlabel('Days')
 
+%usiamo questi dati come condizione iniziale per l'ottimizzazione
+x0_opt=soluzione(novax+nolockdown,:);
 %% Introduzione del lockdown
 %lockdown introdotto dopo nolockdown giorni
 %questo caso equivale alla scalatura di R0 ma viene effettuata attraverso
@@ -184,7 +186,7 @@ Lvect= [zeros(nolockdown,1); 0*ones(novax,1)]; %da qua possiamo gestire il lockd
 x0_casc_inf = [1-1*E0 , 1*E0, zeros(1,40)];
 
 tic
-[x_vaccini_tot]= ode4(@gatto_vaccini_unico_cascatesoloInfetti, 0, 1, nolockdown+novax, x0_casc_inf'); 
+[x_vaccini_tot]= ode4(@gatto_vaccini_unico_cascatesoloInfetti, 0, 1, nolockdown+novax-1, x0_casc_inf'); 
 toc
 % lambda in questo file accoppia le sottodinamiche dei 3 set di equazioni dei vaccini
 soluzione= zeros(novax+nolockdown, 42);
@@ -207,7 +209,7 @@ figure(3)
 plot(soluzione(:,[2,3, 6:8])) %altre variabili 1 gatto
 legend('E(t)','P(t)','I3(t)', 'A(t)', 'H(t)', 'Q(t)', 'R(t)', 'D(t)')
 
-%% %% Prova del funzionale di costo
+%% Prova del funzionale di costo
 
 global N_ott r ts xi w t_ott f R0
 N_ott = N-nolockdown-novax; %lavoro su 165, con lockdown ottimale e vaccini
@@ -218,18 +220,17 @@ r=0.05;
 xi=0; % termine aggiuntivo come extra costo delle vite
 w=65000;
 t_ott = 0:1:N_ott-1;
-f= 0.99999; % parametro per gestire lo sbilanciamento del funzionale (costo delle vite vs perdite economiche)
+f= 0.5; % parametro per gestire lo sbilanciamento del funzionale (costo delle vite vs perdite economiche)
 %siccome stiamo parlando del rilascio di lockdown, non ci interessa partire
 %con valore di L a 0
-x0= [1-1*E0 1*E0 zeros(1,22)]; % condizioni iniziali per risolvere le ode
+x0= x0_opt; % condizioni iniziali per risolvere le ode
 Lvect = zeros(N_ott,1);
-U0 = [0.5*ones(N_ott,1)]; %condizioni iniziali di vettore di ingresso di lockdown per l'ottimizzatore
+U0 = [0*ones(N_ott,1)]; %condizioni iniziali di vettore di ingresso di lockdown per l'ottimizzatore
 
 lb= zeros(N_ott,1); % lower bounds
 ub= 0.9*ones(N_ott,1); % upper bounds
 
-%ed attenzione che devo aggiornare il modello affinchè l'epidemia viaggi
-%con tempo di raddoppio circa 3, settando qui R0=2.3
+%aggiorniamo il modello affinchè l'epidemia viaggicon tempo di raddoppio circa 3, settando qui R0=2.3
 R0= 2.3;
 r0_raddoppio; 
 
@@ -240,11 +241,11 @@ t = 0:N_ott-1;
 % evolution 
 Lvect = Uvec;
 tic
-[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0, 1, 164, x0'); 
+[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0, 1, N_ott-1, x0'); 
 toc
-% lambda in questo file accoppia le sottodinamiche dei 3 set di equazioni dei vaccini
-soluzione= zeros(novax+nolockdown, 24);
-for j=1:1:165
+
+soluzione= zeros(N_ott, 24);
+for j=1:1:N_ott
     for i= 1:1:24
         soluzione(j,i)=x_vaccini_tot(24*(j-1)+i);
     end
@@ -259,6 +260,9 @@ figure(2)
 plot(soluzione(:,:))
 ylabel('22 variables')
 xlabel('Days')
+
+figure(3)
+plot(soluzione(:, [2 3 4 5 6 7 8 9]))
 
 %% ora proviamo ad impostare l'ottimizzazione parametrica: tipo lockdown costante su tutta la finestra temporale
 %come prima aggiustando R0 per avere il tasso di raddoppio richiesto
@@ -278,9 +282,6 @@ ts=1;
 xi=0;
 w=65000;
 t_ott = 0:1:N_ott-1;
-
-options_lockdown= optimoptions('fmincon','Display','iter-detailed','Algorithm','active-set',...
-     'FunValCheck','on');
 
 %time1=0:1:N-nolockdown-1;
 % U0 = [zeros(nolockdown,1); 0.7.*ones(N-nolockdown,1).*(1-time1'./(N-nolockdown))];
