@@ -16,7 +16,7 @@ global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
 %R0 = 3.3 per raddoppio a circa 2.5
 %R0 = 2.9 per una via di mezzo, con tempo raddoppio pari a 3
 
-R0=1.1;
+R0=1;
 
 betaA_betaP= 0.033;
 betaI_betaA= 1.03;
