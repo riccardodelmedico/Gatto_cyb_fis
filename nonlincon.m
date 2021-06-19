@@ -5,7 +5,7 @@ global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH alfaH ...
     Lvect teta N_ott r ts xi w t_ott f
 ceq = [];
 Lvect = Uing;
-[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0,1,N_ott-1, x0); 
+[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0,1,N_ott-1, x0'); 
 
 x= zeros(N_ott, 24);
 for j=1:1:N_ott
@@ -15,7 +15,8 @@ for j=1:1:N_ott
 end
 
 
-c = -x(:, [1 10 19]);
+c = -x(:,1);
 %così diciamo che tutte le vairabili devono essere positive
-
+% figure(1)
+% plot(c)
 end

@@ -120,7 +120,7 @@ x0_opt=soluzione(novax+nolockdown,:);
 %che settiamo un coefficiente (1-teta*L)^2 di fronte a lambda.
 %e quindi riassegnamo a R0 il valore originale
 R0 = 3.6;
-Lvect = [zeros(nolockdown,1);0.95*ones(N-nolockdown,1)];
+Lvect = [zeros(nolockdown,1);0.635*ones(N-nolockdown,1)];
 parameters_vaccini;
 x0= [1-1*E0; 1*E0; zeros(22,1)];
 
@@ -237,7 +237,7 @@ x0= x0_opt; % condizioni iniziali per risolvere le ode
 Lvect = zeros(N_ott,1);
 U0 = [0.5*ones(N_ott,1)]; %condizioni iniziali di vettore di ingresso di lockdown per l'ottimizzatore
 
-lb= [0.5*ones((N_ott+1)/2,1);0.2*ones((N_ott+1)/2-1,1)]; % lower bounds
+lb= [0.4*ones((N_ott+1)/2,1);0.2*ones((N_ott+1)/2-1,1)]; % lower bounds
 ub= 0.95*ones(N_ott,1); % upper bounds
 
 %aggiorniamo il modello affinchè l'epidemia viaggi con tempo di raddoppio
@@ -246,7 +246,7 @@ R0= 2.65;
 r0_raddoppio; 
 
 tic
-[Uvec,fval,exitflag] = fmincon(@cost_function,U0,[],[],[],[],lb,ub,[], options_lockdown);
+[Uvec,fval,exitflag] = fmincon(@cost_function,U0,[],[],[],[],lb,ub,@nonlincon, options_lockdown);
 toc
 t = 0:N_ott-1;
 % evolution 
