@@ -3,8 +3,7 @@ clear
 clear all
 %%
 global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
-       alfaH gammaQ gammaA x0 N eff1 eff2 ef1 prima_d seconda_d Lvect NV R0 ...
-       x0_casc_inf_opt
+       alfaH gammaQ gammaA x0 N eff1 eff2 ef1 prima_d seconda_d Lvect NV R0
 R0 = 3.6;
 format longg %utilizzando valori molto piccoli le 4 cifre decimali non sono sufficienti
 dati_vaccini;
@@ -83,10 +82,10 @@ R0= 1.0; % si può settare l'R0 desiderato, r0_raddoppio aggiorna i beta_i
 r0_raddoppio; %ricalcolo dei beta_i con R0=1.1
 % carichiamo i nuovi parametri dei vaccini (si potrebbe fare anche con il lockdown, ma così scaliamo direttamente R0 e i beta)
 
-x01 = soluzione1(nolockdown,:)'; %aggiorniamo le condizioni iniziali del nuovo sistema
+x01 = soluzione1(nolockdown,:); %aggiorniamo le condizioni iniziali del nuovo sistema
 
 tic
-[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0,1,novax-1, x01); 
+[x_vaccini_tot]= ode4(@gatto_vaccini_unico, 0,1,novax-1, x01'); 
 toc
 %
 soluzione2= zeros(novax, 24);
@@ -114,7 +113,6 @@ xlabel('Days')
 
 %usiamo questi dati come condizione iniziale per l'ottimizzazione
 x0_opt=soluzione(novax+nolockdown,:);
-soluzione_finale1= soluzione(:,:);
 %% Introduzione del lockdown
 %lockdown introdotto dopo nolockdown giorni
 %questo caso equivale alla scalatura di R0 ma viene effettuata attraverso
@@ -157,7 +155,7 @@ global x0_casc
 
 parameters_vaccini;
 
-Lvect= [zeros(nolockdown,1); zeros(novax,1)]; %da qua possiamo gestire il lockdown sui vari intervalli
+Lvect= [zeros(nolockdown,1); 0*ones(novax,1)]; %da qua possiamo gestire il lockdown sui vari intervalli
 x0_casc = [1-1*E0; 1*E0; zeros(29,1)]; %aumentano le CI aumentanto i compartimenti
 
 tic
@@ -165,7 +163,7 @@ tic
 toc
 % lambda in questo file accoppia le sottodinamiche dei 3 set di equazioni dei vaccini
 soluzione= zeros(novax+nolockdown, 31);
-for j=1:1:novax+nolockdown
+for j=1:1:295
     for i= 1:1:31
         soluzione(j,i)=x_vaccini_tot(31*(j-1)+i);
     end
@@ -192,7 +190,7 @@ xlabel('Days')
 
 global x0_casc_inf
 
-Lvect= [zeros(nolockdown,1); zeros(novax,1)]; %da qua possiamo gestire il lockdown sui vari intervalli
+Lvect= [zeros(nolockdown,1); 0*ones(novax,1)]; %da qua possiamo gestire il lockdown sui vari intervalli
 x0_casc_inf = [1-1*E0; 1*E0; zeros(40,1)];
 
 tic
@@ -200,7 +198,7 @@ tic
 toc
 % lambda in questo file accoppia le sottodinamiche dei 3 set di equazioni dei vaccini
 soluzione= zeros(novax+nolockdown, 42);
-for j=1:1:novax+nolockdown
+for j=1:1:295
     for i= 1:1:42
         soluzione(j,i)=x_vaccini_tot(42*(j-1)+i);
     end
@@ -213,32 +211,33 @@ xlabel('Days')
 
 figure(2)
 plot(soluzione(:,1)) %visione suscettibili
-legend('S(t)','S1(t)','S2(t)'); xlabel('Days');
+legend('S(t)','S1(t)','S2(t)')
 
 figure(3)
-plot(soluzione(:,[2 3 4 5 6 7 8 9 10 11 12 13 15])) %altre variabili 1 gatto
-legend('E1(t)','E2(t)','E3(t)','P(t)', 'I1(t)','I2(t)','I3(t)', 'A1(t)','A2(t)','A3(t)', 'H(t)', 'Q(t)',  'D(t)')
-xlabel('Days')
-%% Ottimizzazione con funzionale di costo Alvarez
+plot(soluzione(:,[2,3, 6:8])) %altre variabili 1 gatto
+legend('E(t)','P(t)','I3(t)', 'A(t)', 'H(t)', 'Q(t)', 'R(t)', 'D(t)')
 
-global N_ott r xi w t_ott f R0
+x0_casc_inf_opt=soluzione(novax+nolockdown,:);
+
+%% Prova del funzionale di costo
+
+global N_ott r ts xi w t_ott f R0
 N_ott = N-nolockdown-novax; %lavoro su 165, con lockdown ottimale e vaccini
 prima_d = prima_dose_norm;
 seconda_d = seconda_dose_norm;
 
 r=0.05;
-xi=3700000; % termine aggiuntivo come extra costo delle vite
+xi=0; % termine aggiuntivo come extra costo delle vite
 w=65000;
 t_ott = 0:1:N_ott-1;
-f= 0.5; % parametro per gestire lo sbilanciamento del funzionale (costo delle vite vs perdite economiche)
+f= 0.99; % parametro per gestire lo sbilanciamento del funzionale (costo delle vite vs perdite economiche)
 %siccome stiamo parlando del rilascio di lockdown, non ci interessa partire
 %con valore di L a 0
-x0= x0_opt'; % condizioni iniziali per risolvere le ode
+x0= x0_opt; % condizioni iniziali per risolvere le ode
 Lvect = zeros(N_ott,1);
-U0 = [0.5*ones(N_ott,1)]; %condizioni iniziali di vettore di ingresso di lockdown per l'ottimizzatore
+U0= [0.65*ones((N_ott+1)/2,1);0.45*ones((N_ott+1)/2-1,1)]; %condizioni iniziali di vettore di ingresso di lockdown per l'ottimizzatore
 
-lb= zeros(N_ott,1);
-%lb= [0.4*ones((N_ott+1)/2,1);0.2*ones((N_ott+1)/2-1,1)]; % lower bounds
+lb= [0*ones((N_ott+1)/2,1);0*ones((N_ott+1)/2-1,1)]; % lower bounds
 ub= 0.95*ones(N_ott,1); % upper bounds
 
 %aggiorniamo il modello affinchè l'epidemia viaggi con tempo di raddoppio
@@ -263,8 +262,6 @@ for j=1:1:N_ott
     end
 end
 
-sol_opt=[soluzione_finale1;soluzione(:,:)]; %uniamo la soluzione sui 295 giorni a quella sui 165 giorni di vax
-
 figure(1)
 plot(Uvec)
 legend('Optimizated lockdown')
@@ -277,22 +274,82 @@ xlabel('Days')
 
 figure(3)
 plot(soluzione(:, [2 3 4 5 6 7 8 9]))
+xlabel('Days')
+ylabel('No vaxed population')
 
-figure(4)
-plot(soluzione(:, [1 10 19]));
-legend('S(t)','S1(t)','S2(t)'); xlabel('Days');
+%% %% Ottimizzazione con cascate di ODE
+% 
+% global N_ott r ts xi w t_ott f R0
+% N_ott = N-nolockdown-novax; %lavoro su 165, con lockdown ottimale e vaccini
+% prima_d = prima_dose_norm;
+% seconda_d = seconda_dose_norm;
+% 
+% r=0.05;
+% xi=0; % termine aggiuntivo come extra costo delle vite
+% w=65000;
+% t_ott = 0:1:N_ott-1;
+% f= 0; % parametro per gestire lo sbilanciamento del funzionale (costo delle vite vs perdite economiche)
+% %siccome stiamo parlando del rilascio di lockdown, non ci interessa partire
+% %con valore di L a 0
+% x0= x0_opt; % condizioni iniziali per risolvere le ode
+% Lvect = zeros(N_ott,1);
+% U0 = [0.5*ones(N_ott,1)]; %condizioni iniziali di vettore di ingresso di lockdown per l'ottimizzatore
+% 
+% lb= [0*ones((N_ott+1)/2,1);0*ones((N_ott+1)/2-1,1)]; % lower bounds
+% ub= 0.95*ones(N_ott,1); % upper bounds
+% 
+% %aggiorniamo il modello affinchè l'epidemia viaggi con tempo di raddoppio
+% %circa 3, settando qui R0=2.65
+% R0= 2.65;
+% r0_raddoppio; 
+% 
+% tic
+% [Uvec,fval,exitflag] = fmincon(@cost_function_waterfall,U0,[],[],[],[],lb,ub,@nonlincon_casc, options_lockdown);
+% toc
+% t = 0:N_ott-1;
+% % evolution 
+% Lvect = Uvec;
+% tic
+% [x_vaccini_tot]= ode4(@gatto_vaccini_unico_cascatesoloInfetti, 0, 1, N_ott-1, x0'); 
+% toc
+% 
+% soluzione= zeros(N_ott, 42);
+% for j=1:1:N_ott
+%     for i= 1:1:42
+%         soluzione(j,i)=x_vaccini_tot(42*(j-1)+i);
+%     end
+% end
+% 
+% figure(1)
+% plot(Uvec)
+% legend('Optimizated lockdown')
+% xlabel('Days')
+% 
+% figure(2)
+% plot(soluzione(:,:))
+% ylabel('42 variables')
+% xlabel('Days')
+% 
+% figure(3)
+% plot(soluzione(:, [2 3 4 5 6 7 8 9 10 11 12 13 14 15])) %primo set di equazioni
 
-figure(5)
-plot(sol_opt(:,:));
-xlabel('Days'); ylabel('All the variables')
+
+%
 
 %% ODE waterfall con cambio di R0 
 % ora facciamo la cascata di 3 ode su infetti come suggerito da manfredi
 % (su infetti, esposti, asintomatici), per fornire le condizioni iniziale
 % dopo 25 giorni nolockdown e 270 novax con R0=1.0
 
+%cambiamo i parametri equivalenti di R0, poichè l'epidemia rallenta
+%a causa delle nuove distribuzioni gamma
+parameters_vaccini
+dati_vaccini
+prima_d= [zeros(novax+nolockdown,1); prima_dose_norm];
+seconda_d=[zeros(novax+nolockdown,1); seconda_dose_norm];
+
 global x0_casc_inf
-R0=3.6;
+R0=5.5;
 r0_raddoppio;
 Lvect= [zeros(nolockdown,1); zeros(novax,1)]; %da qua possiamo gestire il lockdown sui vari intervalli
 x0_casc_inf = [1-1*E0; 1*E0; zeros(40,1)];
@@ -326,7 +383,7 @@ end
 soluzione=[soluzione1(:,:);soluzione2(:,:)];
 
 figure(1)
-plot( soluzione(:,:))%plot totale
+plot( soluzione(:,1))%plot totale
 legend('S(t)','E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
 xlabel('Days')
 
@@ -343,23 +400,23 @@ r=0.05;
 xi=0; % termine aggiuntivo come extra costo delle vite
 w=65000;
 t_ott = 0:1:N_ott-1;
-f= 0; % parametro per gestire lo sbilanciamento del funzionale (costo delle vite vs perdite economiche)
+f= 0.9; % parametro per gestire lo sbilanciamento del funzionale (costo delle vite vs perdite economiche)
 %siccome stiamo parlando del rilascio di lockdown, non ci interessa partire
 %con valore di L a 0
-x0= x0_opt; % condizioni iniziali per risolvere le ode
+x0_casc_inf= x0_casc_inf_opt; % condizioni iniziali per risolvere le ode
 Lvect = zeros(N_ott,1);
-U0 = [0.5*ones(N_ott,1)]; %condizioni iniziali di vettore di ingresso di lockdown per l'ottimizzatore
+U0 = [0.7*ones(N_ott,1)]; %condizioni iniziali di vettore di ingresso di lockdown per l'ottimizzatore
 
-lb= [0.5*ones((N_ott+1)/2,1);0.2*ones((N_ott+1)/2-1,1)]; % lower bounds
+lb= [0*ones((N_ott+1)/2,1);0*ones((N_ott+1)/2-1,1)]; % lower bounds
 ub= 0.95*ones(N_ott,1); % upper bounds
-
+%
 %aggiorniamo il modello affinchè l'epidemia viaggi con tempo di raddoppio
 %circa 3, settando qui R0=2.65
 R0= 2.65;
 r0_raddoppio; 
 
 tic
-[Uvec,fval,exitflag] = fmincon(@cost_function_waterfall,U0,[],[],[],[],lb,ub,[], options_lockdown);
+[Uvec,fval,exitflag] = fmincon(@cost_function_waterfall,U0,[],[],[],[],lb,ub,@nonlincon_casc, options_lockdown);
 toc
 t = 0:N_ott-1;
 % evolution 
@@ -375,16 +432,18 @@ for j=1:1:N_ott
     end
 end
 
-figure(1)
+figure(8)
 plot(Uvec)
 legend('Optimizated lockdown')
 xlabel('Days')
 
-figure(2)
+figure(9)
 plot(soluzione(:,:))
 ylabel('42 variables')
 xlabel('Days')
 
+
+%%
 % %% ora proviamo ad impostare l'ottimizzazione parametrica: tipo lockdown costante su tutta la finestra temporale
 % %come prima aggiustando R0 per avere il tasso di raddoppio richiesto
 % 
