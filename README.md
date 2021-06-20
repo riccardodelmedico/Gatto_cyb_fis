@@ -1,2 +1,11 @@
-Project: Gatto_cyb_fis
-Provo a usare git
+Code Guide
+In the folder there are two principal files: main.m and R0_calcolo.m. The other files contain several functions and datas that are called from the the others.
+cost_function.m and cost_function_waterfall.m contain the Alvarez cost functional, readapted as described on the report, and they are called during the optimization.
+dati_vaccini.m contains a table, imported from GitHub (source Gimbe), with the real data of vaccines in Italy from the 27th December 2020 (refers to the file 'somministrazioni-vaccini-latest.csv'). This table is processed in order to become two vectors of 165 rows, containing the first and second dose daily somministraion of vaccines.
+gatto_vacccini_unico.m, gatto_vacccini_unico_cascate.m, gatto_vacccini_unico_cascatesoloInfetti.m contains the equations of the model. The first one is the augmented model, with lockdown and vaccines (settable from the main file), while the second and the third contains the model with waterfall of differential equation (on E,H and E,I,A respectively).
+main.m is where are contained the free evolution, lockdown, vaccines implementation, followed by the waterfall of differential equation (both case) and the optimization.
+nonlincon.m, nonlincon_casc.m are functions, which contain non linear constrains, used during the optimization, to avoid that some variables become negative (not realistic situation). 
+ode4.m is the resolutor used in this work. It takes a system of differential equation and the associated time on which they have to be resolved. Notice that its output is a vector, so we need to create a 'for' cycle in order to assign the output to a matricial form.
+parameters_vaccini.m contains che parameters from Alvarez and Gatto.
+r0_raddoppio.m is a function used to recalculate the parameters beta_i in function of R0, according the the Gatto's theory.
+R0_calcolo.m is the file where we estimate the value of doubling time, witha separate analysis for each model, and in the case of R0=3.6 (basic case) or with the R0 recalculated.
