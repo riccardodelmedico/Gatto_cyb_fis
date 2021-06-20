@@ -2,11 +2,11 @@ function cost_function_value = cost_function_waterfall(Utry)
 
 global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH alfaH ...
     gammaQ betaP betaA betaI N eff1 eff2 ef1 prima_d seconda_d ...
-    Lvect teta N_ott r ts xi w t_ott f x0_casc_inf_opt
+    Lvect teta N_ott r ts xi w t_ott f x0_casc_inf_opt x0_casc_inf
 
 %ora l'orizzonte temporale di soluzione è solo quello sui vaccini
 Lvect = Utry;
-[x_vaccini_tot]= ode4(@gatto_vaccini_unico_cascatesoloInfetti, 0,1,N_ott-1, x0_casc_inf_opt); 
+[x_vaccini_tot]= ode4(@gatto_vaccini_unico_cascatesoloInfetti, 0,1,N_ott-1, x0_casc_inf); 
 
 x= zeros(N_ott, 42);
 for j=1:1:N_ott
