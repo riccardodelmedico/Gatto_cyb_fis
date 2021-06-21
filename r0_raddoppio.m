@@ -1,6 +1,5 @@
 %% Script per il cambio di R0, da settare nel main
-global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
-    alfaH gammaQ gammaA betaP betaI betaA eff1 eff2 ef1 teta R0
+global deltaP sig eta gammaI alfaI gammaA gammaA betaP betaI betaA R0
 %i seguenti per il modello base
 %R0 = 2.13 per raddoppio pari a circa 3.5
 %R0 = 2.6 per raddoppio a circa 2.5
@@ -16,7 +15,7 @@ global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
 %R0 = 3.3 per raddoppio a circa 2.5
 %R0 = 2.9 per una via di mezzo, con tempo raddoppio pari a 3
 
-%non assegano qui R0 se lo scope della variabile è globale
+%lo scope di R0 è globale, quindi il calcolo viene effettuato richiamandolo nel main
 
 betaA_betaP= 0.033;
 betaI_betaA= 1.03;

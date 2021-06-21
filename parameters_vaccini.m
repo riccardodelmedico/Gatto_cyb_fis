@@ -1,7 +1,6 @@
 global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
     alfaH gammaQ gammaA betaP betaI betaA eff1 eff2 ef1 teta R0
 
-%R0=3.6;
 deltaE= 1 / 3.32;
 deltaP= 1 / 0.75;
 eta= 1 / 4.05;
@@ -17,22 +16,21 @@ betaI_betaA= 1.03;
 % betaP2/ betaP1== 0.66; % betaP2 after restriction on march 8, 2020
 % deltat0= 34.94;
 % omega= 7.84;
-zeta= 0.4; % fraction of sympomatic infected being quarantined
+zeta= 0.4; % frazione dei sintomatici infettati in quarantena
 alfaH = alfaI;
 % rs= 0.5;
-eff1 = 0.9;
-eff2 = 1;
-ef1 = 0.7;
+eff1 = 0.9; %efficacia della prima dose nel prevenire da infezione
+eff2 = 1; %efficacia della seconda dose nel prevenire da infezione
+ef1 = 0.7; %efficacia della prima dose nel prevenire da gravi sintomi
 teta = 0.75; %efficacia del lockdown
 
 options_lockdown = optimoptions('fmincon','Display','iter-detailed','Algorithm','active-set','FunValCheck','on');
-options_ode = odeset('RelTol',1e-7,'AbsTol',1e-8);
 
 x1=1/deltaP;
 x2=sig/(eta+alfaI+gammaI);
 x3=(1-sig)/gammaA;
 
-B = [0; 0; 3.6]; %termini noti
+B = [0; 0; R0]; %termini noti
 X = [1 0 -betaA_betaP; -betaI_betaA 1 0; x3 x2 x1];
 A = linsolve(X,B);
 betaA = A(1);

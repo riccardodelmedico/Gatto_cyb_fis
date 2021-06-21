@@ -1,4 +1,3 @@
-
 %% Dati su vaccinazione in Italia (al 2021/06/9)
 T=readtable('somministrazioni-vaccini-latest.csv');
 

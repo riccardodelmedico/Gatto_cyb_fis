@@ -19,8 +19,7 @@ H = x(12); %ospedalizzati
 Q = x(13); %quarantena casalinga
 R = x(14); %recuperati
 D = x(15); %dead
-% parameters_vaccini;
-% dati_vaccini;
+
 S1 = x(16); %suscettibili
 E11 = x(17);
 E12 = x(18);
@@ -36,8 +35,7 @@ H1 = x(27); %ospedalizzati
 Q1 = x(28); %quarantena casalinga
 R1 = x(29); %recuperati
 D1 = x(30); %dead
-% parameters_vaccini;
-% dati_vaccini;
+
 S2 = x(31); %suscettibili
 E21 = x(32);
 E22 = x(33);
@@ -55,10 +53,8 @@ prima_dos=prima_d(fix(t)+1);
 seconda_dos=seconda_d(fix(t)+1);
 L=Lvect(fix(t)+1);
 
-
 lambda= (betaP*(P+P1+P2) + betaI*(I3+I13+I23) + betaA*(A3+A13+A23))/((S+S1+S2) + (E1+E2+E3+E11+E12+E13+E21+E22+E23)+...
     (I1+I2+I3+I11+I12+I13+I21+I22+I23) + (A1+A2+A3+A11+A12+A13+A21+A22+A23) + (R+R1+R2));
-
 
 xdot = zeros(42,1);
 
@@ -108,7 +104,6 @@ xdot = zeros(42,1);
     xdot(40) = gammaA*3*A21 - gammaA*3*A22;
     xdot(41) = gammaA*3*A22 - gammaA*3*A23;
     xdot(42) = gammaI*3*I23 + gammaA*3*A23;
-
 
 end
 

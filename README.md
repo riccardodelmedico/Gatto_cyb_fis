@@ -8,4 +8,4 @@ nonlincon.m, nonlincon_casc.m are functions, which contain non linear constrains
 ode4.m is the resolutor used in this work. It takes a system of differential equation and the associated time on which they have to be resolved. Notice that its output is a vector, so we need to create a 'for' cycle in order to assign the output to a matricial form.
 parameters_vaccini.m contains che parameters from Alvarez and Gatto.
 r0_raddoppio.m is a function used to recalculate the parameters beta_i in function of R0, according the the Gatto's theory.
-R0_calcolo.m is the file where we estimate the value of doubling time, witha separate analysis for each model, and in the case of R0=3.6 (basic case) or with the R0 recalculated.
+R0_calcolo.m is the file where we estimate the value of doubling time, with a separate analysis for each model, and in the case of R0=3.6 (basic case) or with the R0 recalculated.

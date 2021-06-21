@@ -13,10 +13,6 @@ for j=1:1:N_ott
         x(j,i)=x_vaccini_tot(24*(j-1)+i);
     end
 end
+c = -x(:,1); %così diciamo che tutte le vairabili devono essere positive
 
-
-c = -x(:,1);
-%così diciamo che tutte le vairabili devono essere positive
-% figure(1)
-% plot(c)
 end

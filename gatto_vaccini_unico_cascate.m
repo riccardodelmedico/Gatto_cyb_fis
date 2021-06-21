@@ -82,5 +82,4 @@ xdot = zeros(31,1);
     xdot(30) = (1 - sig)*deltaP*P2 - gammaA*A2;
     xdot(31) = gammaI*I2 + gammaA*A2;
 
-
 end
