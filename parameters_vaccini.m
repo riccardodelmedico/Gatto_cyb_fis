@@ -1,4 +1,4 @@
-global lambda deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
+global  deltaE deltaP sig eta gammaI alfaI gammaA zeta gammaH ...
     alfaH gammaQ gammaA betaP betaI betaA eff1 eff2 ef1 teta R0
 
 deltaE= 1 / 3.32;
@@ -24,7 +24,7 @@ eff2 = 1; %efficacia della seconda dose nel prevenire da infezione
 ef1 = 0.7; %efficacia della prima dose nel prevenire da gravi sintomi
 teta = 0.75; %efficacia del lockdown
 
-options_lockdown = optimoptions('fmincon','Display','iter-detailed','Algorithm','active-set','FunValCheck','on');
+options_lockdown = optimoptions('fmincon','Display','iter-detailed','Algorithm','active-set','FunValCheck','on','MaxFunctionEvaluation',2.7e04);
 
 x1=1/deltaP;
 x2=sig/(eta+alfaI+gammaI);
@@ -41,6 +41,6 @@ novax= 270; % 9 mesi senza vaccinazioni
 NV = length(prima_dose_norm); % numero di giorni con vaccini
 N= nolockdown + novax + NV;
 
-clear x1 x2 x3 B X A betaA_betaP betaI_betaA
+clear x1 x2 x3 B X A betaA_betaP betaI_betaA NV 
 
 

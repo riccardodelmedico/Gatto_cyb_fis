@@ -268,26 +268,31 @@ xlabel('Days')
 
 figure(2)
 plot(soluzione(:,:))
-ylabel('22 variables')
+ylabel('All variables')
 xlabel('Days')
 
 figure(3)
 plot(soluzione(:, 1:9))
 xlabel('Days')
-ylabel('First dose population')
+ylabel('No vaxed population')
+legend('S(t)','E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
 
 figure(4)
 plot(soluzione(:, 10:18))
 xlabel('Days')
-ylabel('Second dose population')
+ylabel('First dose population')
+legend('S(t)','E(t)','P(t)','I(t)','A(t)','H(t)','Q(t)','R(t)','D(t)')
 
+figure(5)
 plot(soluzione(:, 19:24))
 xlabel('Days')
-ylabel('No vaxed population')
+ylabel('Second dose population')
+legend('S(t)','E(t)','P(t)','I(t)','A(t)','R(t)')
 
+figure(6)
 plot(soluzione(:, [1 10 19]))
 xlabel('Days')
-ylabel('S(t)', 'S1(t)', 'S2(t)')
+legend('S(t)', 'S1(t)', 'S2(t)')
 %% ODE waterfall con cambio di R0 
 % ora facciamo la cascata di 3 ode su infetti, esposti, asintomatici come suggerito da Manfredi, per fornire le condizioni iniziale
 % dopo 25 giorni (nolockdown) e 270 giorni (novax) con R0=1.0
@@ -395,5 +400,27 @@ xlabel('Days')
 
 figure(2)
 plot(soluzione(:,:))
-ylabel('42 variables')
+ylabel('All variables')
 xlabel('Days')
+
+figure(3)
+plot(soluzione(:, 1:15))
+xlabel('Days'); ylabel('No vaxed population');
+legend('S(t)','E1(t)','E2(t)','E3(t)','P(t)','I1(t)','I2(t)','I3(t)','A1(t)','A2(t)','A3(t)','H(t)','Q(t)','R(t)','D(t)')
+
+figure(4)
+plot(soluzione(:, 16:30))
+xlabel('Days')
+ylabel('First dose population')
+legend('S(t)','E1(t)','E2(t)','E3(t)','P(t)','I1(t)','I2(t)','I3(t)','A1(t)','A2(t)','A3(t)','H(t)','Q(t)','R(t)','D(t)')
+
+figure(5)
+plot(soluzione(:, 31:42))
+xlabel('Days')
+ylabel('Second dose population')
+legend('S(t)','E1(t)','E2(t)','E3(t)','P(t)','I1(t)','I2(t)','I3(t)','A1(t)','A2(t)','A3(t)','R(t)')
+
+figure(6)
+plot(soluzione(:, [1 16 31]))
+xlabel('Days')
+legend('S(t)', 'S1(t)', 'S2(t)')
